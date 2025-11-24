@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ContainerCover } from '../components/ui/ContainerCover';
 import './Home.css';
+import { CometCard } from '../components/ui/comet-card.jsx';
 
 const Home = () => {
     return (
@@ -30,26 +31,41 @@ const Home = () => {
                     </div>
 
                     <div className="services-grid">
-                        <div className="service-card">
-                            <div className="icon-box"><HomeIcon size={32} /></div>
-                            <h3>Reformas de Viviendas</h3>
-                            <p>Transformamos tu hogar con diseños funcionales y acabados de primera calidad. Cocinas, baños y reformas integrales.</p>
-                            <Link to="/servicios" className="link-arrow">Saber más <ArrowRight size={16} /></Link>
-                        </div>
+                        <CometCard>
+                            <div className="service-card">
+                                <div className="icon-box"><HomeIcon size={32} /></div>
+                                <h3>Reformas de Viviendas</h3>
+                                <p>Transformamos tu hogar con diseños funcionales y acabados de primera calidad. Cocinas, baños y reformas integrales.</p>
+                                <Link to="/servicios" className="link-arrow">Saber más <ArrowRight size={16} /></Link>
+                            </div>
+                        </CometCard>
 
-                        <div className="service-card">
-                            <div className="icon-box"><Building size={32} /></div>
-                            <h3>Locales Comerciales</h3>
-                            <p>Creamos espacios de negocio atractivos y funcionales que impulsan tu marca y mejoran la experiencia de tus clientes.</p>
-                            <Link to="/servicios" className="link-arrow">Saber más <ArrowRight size={16} /></Link>
-                        </div>
+                        <CometCard>
+                            <div className="service-card">
+                                <div className="icon-box"><Building size={32} /></div>
+                                <h3>Locales Comerciales</h3>
+                                <p>Creamos espacios de negocio atractivos y funcionales que impulsan tu marca y mejoran la experiencia de tus clientes.</p>
+                                <Link to="/servicios" className="link-arrow">Saber más <ArrowRight size={16} /></Link>
+                            </div>
+                        </CometCard>
 
-                        <div className="service-card">
-                            <div className="icon-box"><Hammer size={32} /></div>
-                            <h3>Fachadas y Comunidades</h3>
-                            <p>Rehabilitación de edificios, fachadas y zonas comunes con las mejores técnicas y materiales del mercado.</p>
-                            <Link to="/servicios" className="link-arrow">Saber más <ArrowRight size={16} /></Link>
-                        </div>
+                         <CometCard>
+                            <div className="service-card">
+                                <div className="icon-box"><Building size={32} /></div>
+                                <h3>Locales Comerciales</h3>
+                                <p>Creamos espacios de negocio atractivos y funcionales que impulsan tu marca y mejoran la experiencia de tus clientes.</p>
+                                <Link to="/servicios" className="link-arrow">Saber más <ArrowRight size={16} /></Link>
+                            </div>
+                        </CometCard>
+
+                        <CometCard>
+                            <div className="service-card">
+                                <div className="icon-box"><Hammer size={32} /></div>
+                                <h3>Fachadas y Comunidades</h3>
+                                <p>Rehabilitación de edificios, fachadas y zonas comunes con las mejores técnicas y materiales del mercado.</p>
+                                <Link to="/servicios" className="link-arrow">Saber más <ArrowRight size={16} /></Link>
+                            </div>
+                        </CometCard>
                     </div>
                 </div>
             </section>
