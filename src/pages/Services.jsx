@@ -1,121 +1,586 @@
-import { Check, ArrowRight } from 'lucide-react';
+import { ModernNavbar } from '../components/layout/ModernNavbar';
+import ModernFooter from '../components/layout/ModernFooter';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import {
+  Check,
+  ArrowRight,
+  Building2,
+  Wrench,
+  Bath,
+  Store,
+  Building,
+  Zap,
+  Waves,
+  BadgeCheck,
+  MessageCircle,
+  Phone,
+  Mail,
+  Sparkles,
+  Star
+} from 'lucide-react';
 import DekorAIEmbed from '../components/integrations/DekorAIEmbed';
 import './Services.css';
 
 const Services = () => {
-    const services = [
-        {
-            id: 'viviendas',
-            title: 'Reformas Integrales de Viviendas',
-            description: 'Convertimos tu casa en el hogar que siempre has soñado. Nos encargamos de todo el proceso, desde el diseño inicial hasta la entrega de llaves, garantizando acabados perfectos y una gestión sin preocupaciones.',
-            features: [
-                'Diseño y planificación de espacios',
-                'Renovación completa de instalaciones (fontanería, electricidad)',
-                'Carpintería a medida (armarios, puertas, suelos)',
-                'Iluminación y domótica',
-                'Gestión de licencias y permisos'
-            ],
-            image: 'https://images.unsplash.com/photo-1484154218962-a1c002085d2f?q=80&w=1000&auto=format&fit=crop'
-        },
-        {
-            id: 'cocinas-banos',
-            title: 'Cocinas y Baños',
-            description: 'Espacios funcionales y estéticos donde el diseño se une a la practicidad. Trabajamos con las mejores marcas para ofrecerte durabilidad y estilo.',
-            features: [
-                'Diseño 3D previo',
-                'Mobiliario de alta calidad',
-                'Sanitarios y grifería de diseño',
-                'Alicatados y solados modernos',
-                'Optimización del espacio'
-            ],
-            image: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?q=80&w=1000&auto=format&fit=crop'
-        },
-        {
-            id: 'locales',
-            title: 'Locales Comerciales y Oficinas',
-            description: 'Entendemos que tu local es tu carta de presentación. Creamos espacios que transmiten la identidad de tu marca y mejoran la productividad.',
-            features: [
-                'Adecuación a normativa vigente',
-                'Diseño corporativo e imagen de marca',
-                'Insonorización y acústica',
-                'Climatización y ventilación',
-                'Plazos ajustados para minimizar el cierre'
-            ],
-            image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop'
-        },
-        {
-            id: 'fachadas',
-            title: 'Fachadas y Comunidades',
-            description: 'Mantenimiento y rehabilitación de edificios para mejorar la eficiencia energética, la seguridad y la estética de tu comunidad.',
-            features: [
-                'Rehabilitación de fachadas (SATE, ventiladas)',
-                'Impermeabilización de cubiertas y tejados',
-                'Instalación de ascensores a cota cero',
-                'Eliminación de barreras arquitectónicas',
-                'Inspección Técnica de Edificios (ITE)'
-            ],
-            image: 'https://images.unsplash.com/photo-1464938050520-ef2270bb8ce8?q=80&w=1000&auto=format&fit=crop'
-        }
-    ];
+  const services = [
+    {
+      id: 'viviendas',
+      title: 'Reformas Integrales de Viviendas',
+      description:
+        'Interiorismo a medida para transformar tu hogar. Cocinas, baños y espacios totalmente renovados con gestión integral.',
+      features: [
+        'Diseño y planificación de espacios',
+        'Renovación completa de instalaciones (fontanería, electricidad)',
+        'Carpintería a medida (armarios, puertas, suelos)',
+        'Iluminación y domótica',
+        'Gestión de licencias y permisos'
+      ],
+      image:
+        '/fondounamunzaga.jpg',
+      icon: Building2,
+      badges: ['Más solicitado', 'Ideal para viviendas'],
+      microStat: '+30 cocinas renovadas este año'
+    },
+    {
+      id: 'cocinas-banos',
+      title: 'Cocinas y Baños',
+      description:
+        'Espacios funcionales y estéticos donde el diseño se une a la practicidad. Materiales premium y acabados duraderos.',
+      features: [
+        'Diseño 3D previo',
+        'Mobiliario de alta calidad',
+        'Sanitarios y grifería de diseño',
+        'Alicatados y solados modernos',
+        'Optimización del espacio'
+      ],
+      image:
+        '/fondounamunzaga.jpg',
+      icon: Bath,
+      badges: ['Ideal para viviendas'],
+      microStat: 'Proyectos con arquitectos y comunidades'
+    },
+    {
+      id: 'locales',
+      title: 'Locales Comerciales y Oficinas',
+      description:
+        'Diseño corporativo para potenciar tu marca y productividad. Plazos ajustados para minimizar cierres.',
+      features: [
+        'Adecuación a normativa vigente',
+        'Diseño corporativo e imagen de marca',
+        'Insonorización y acústica',
+        'Climatización y ventilación',
+        'Plazos ajustados para minimizar el cierre'
+      ],
+      image:
+        '/fondounamunzaga.jpg',
+      icon: Store,
+      badges: ['Recomendado para locales comerciales'],
+      microStat: '+120 locales optimizados en Bilbao'
+    },
+    {
+      id: 'fachadas',
+      title: 'Fachadas y Comunidades',
+      description:
+        'Eficiencia energética, seguridad y estética para tu edificio. Soluciones SATE y cubiertas con garantía.',
+      features: [
+        'Rehabilitación de fachadas (SATE, ventiladas)',
+        'Impermeabilización de cubiertas y tejados',
+        'Instalación de ascensores a cota cero',
+        'Eliminación de barreras arquitectónicas',
+        'Inspección Técnica de Edificios (ITE)'
+      ],
+      image:
+        '/fondounamunzaga.jpg',
+      icon: Building,
+      badges: ['Proyectos con comunidades'],
+      microStat: '+300 comunidades rehabilitadas'
+    },
+    {
+      id: 'reformas',
+      title: 'Reformas',
+      description:
+        'Cubrimos todas las ramas de obras desde derribos hasta las últimas técnicas de reformas, interiorismo y decoración.',
+      features: [
+        'Interiores de viviendas',
+        'Cocinas',
+        'Baños',
+        'Locales comerciales',
+        'Oficinas'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Wrench,
+      badges: ['Servicio integral']
+    },
+    {
+      id: 'insonorizacion',
+      title: 'Insonorización',
+      description:
+        'Soluciones acústicas para mejorar la calidad y confort en cualquier espacio.',
+      features: [
+        'Aislamiento y acondicionamiento',
+        'Licencias de actividad',
+        'Protección frente al ruido',
+        'Control de ruido',
+        'Calidad acústica'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Waves,
+      badges: ['Mejora de confort']
+    },
+    {
+      id: 'reparaciones',
+      title: 'Reparaciones',
+      description:
+        'Atención rápida y eficaz para arreglos y mantenimiento de tu vivienda o negocio.',
+      features: [
+        'Suelos deteriorados',
+        'Maderas desgastadas',
+        'Instalaciones eléctricas',
+        'Instalaciones de fontanería',
+        'Falsos techos caídos'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Wrench,
+      badges: ['Respuesta rápida']
+    },
+    {
+      id: 'impermeabilizacion',
+      title: 'Impermeabilización',
+      description:
+        'Evita filtraciones y humedades con soluciones duraderas para interior y exterior.',
+      features: [
+        'Cimientos y suelos exteriores',
+        'Fachadas y muros',
+        'Suelos y paredes interiores',
+        'Tejados, terrazas y azoteas',
+        'Goteras, filtraciones y humedades'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Waves,
+      badges: ['Protección contra agua']
+    },
+    {
+      id: 'rehabilitaciones',
+      title: 'Rehabilitaciones',
+      description:
+        'Recuperamos y mejoramos edificios y espacios comunes con criterios técnicos y estéticos.',
+      features: [
+        'Fachadas deterioradas',
+        'Restauración de tejados',
+        'Reestructuración de terrazas',
+        'Acondicionamiento de zonas comunitarias',
+        'Reparación de portales'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Building,
+      badges: ['Comunidades']
+    },
+    {
+      id: 'refuerzos-estructuras',
+      title: 'Refuerzos de Estructuras',
+      description:
+        'Seguridad y estabilidad estructural con refuerzos en viviendas y edificios.',
+      features: [
+        'Viviendas',
+        'Edificios',
+        'Vigas',
+        'Columnas',
+        'Forjados y muros'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Building2,
+      badges: ['Ingeniería']
+    },
+    {
+      id: 'accesibilidad',
+      title: 'Accesibilidad',
+      description:
+        'Soluciones para eliminar barreras arquitectónicas y mejorar la accesibilidad.',
+      features: [
+        'Rampas',
+        'Ascensores',
+        'Plataformas de acceso',
+        'Salva escaleras',
+        'Domótica'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: BadgeCheck,
+      badges: ['Mejora accesible']
+    },
+    {
+      id: 'pladur',
+      title: 'Pladúr',
+      description:
+        'Sistemas de pladúr para compartimentación, aislamiento y decoración.',
+      features: [
+        'Separación de espacios',
+        'Aislamiento térmico',
+        'Impermeabilización',
+        'Insonorización',
+        'Decoración'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Wrench,
+      badges: ['Versatilidad']
+    },
+    {
+      id: 'informes-tecnicos',
+      title: 'Informes Técnicos',
+      description:
+        'Evaluaciones y documentación técnica para proyectos y certificaciones.',
+      features: [
+        'Adecuación de ruido',
+        'Eficiencia energética',
+        'Habitabilidad',
+        'Gestión de residuos',
+        'Segregación de viviendas'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: BadgeCheck,
+      badges: ['Documentación']
+    },
+    {
+      id: 'decoraciones-escayola',
+      title: 'Decoraciones en Escayola',
+      description:
+        'Elementos decorativos en escayola para dar personalidad a tus espacios.',
+      features: [
+        'Baldas y estantería',
+        'Arcos',
+        'Columnas',
+        'Cornisas',
+        'Frisos'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Sparkles,
+      badges: ['Decoración']
+    },
+    {
+      id: 'derribos',
+      title: 'Derribos',
+      description:
+        'Demoliciones y retirada de materiales con gestión de residuos.',
+      features: [
+        'Tabiques de ladrillos y pladúr',
+        'Muebles de cocinas y techos',
+        'Aparatos sanitarios',
+        'Suelos, tarimas y revestimientos',
+        'Transporte a vertedero'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Wrench,
+      badges: ['Gestión responsable']
+    },
+    {
+      id: 'carpinteria',
+      title: 'Carpintería',
+      description:
+        'Carpintería interior y exterior con madera y metal.',
+      features: [
+        'Ventanas y puertas de madera',
+        'Ventanas y puertas metálicas',
+        'Interior y exterior',
+        'Tarimas flotantes y parqués',
+        'Escaleras'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Wrench,
+      badges: ['A medida']
+    },
+    {
+      id: 'instalaciones-electricas',
+      title: 'Instalaciones Eléctricas',
+      description:
+        'Modernización y ampliación de instalaciones eléctricas y sistemas de domótica.',
+      features: [
+        'Acometida general',
+        'Modernización de instalaciones eléctricas',
+        'Iluminación general',
+        'Cableados de red para voz y datos',
+        'Porteros, video vigilancia y domótica'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Zap,
+      badges: ['Eficiencia y seguridad']
+    },
+    {
+      id: 'instalaciones-fontaneria',
+      title: 'Instalaciones de Fontanería',
+      description:
+        'Suministro y saneamiento, climatización y ACS con materiales y soluciones actuales.',
+      features: [
+        'Red de suministro y saneamiento',
+        'Sustitución e instalación equipos de cocina y baño',
+        'Calefacción, climatización y agua caliente',
+        'Sustitución de tuberías de plomo, cobre y PVC',
+        'Cálculo calorífico de la vivienda'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Bath,
+      badges: ['Confort y eficiencia']
+    },
+    {
+      id: 'desarrollo-proyectos',
+      title: 'Desarrollo de Proyectos',
+      description:
+        'Dirección y gestión integral de obras nuevas, reformas y rehabilitaciones.',
+      features: [
+        'Obras nuevas',
+        'Reformas de interiores',
+        'Rehabilitación total o parcial de edificios',
+        'Mantenimiento integral de edificaciones',
+        'Remodelación de locales comerciales'
+      ],
+      image: '/fondounamunzaga.jpg',
+      icon: Building2,
+      badges: ['Gestión integral']
+    }
+  ];
 
-    return (
-        <div className="page services-page">
-            <section className="page-header">
-                <div className="container">
-                    <h1>Nuestros Servicios</h1>
-                    <p>Soluciones profesionales para cada tipo de proyecto</p>
-                </div>
-            </section>
+  const [ctaOpen, setCtaOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-            <div className="container services-list">
-                {services.map((service, index) => (
-                    <section key={service.id} id={service.id} className={`service-section ${index % 2 !== 0 ? 'reverse' : ''}`}>
-                        <div className="service-content">
-                            <h2>{service.title}</h2>
-                            <p className="service-description">{service.description}</p>
-                            <ul className="service-features">
-                                {service.features.map((feature, i) => (
-                                    <li key={i}><Check size={18} className="text-accent" /> {feature}</li>
-                                ))}
-                            </ul>
-                            <div className="buttons" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                                <Link to="/contacto" className="btn btn-primary mt-md">Pedir Presupuesto</Link>
-                                <Link to="/proyectos" className="btn btn-outline mt-md">Explora en 360°</Link>
-                            </div>
-                        </div>
-                        <div className="service-image">
-                            <img src={service.image} alt={service.title} loading="lazy" />
-                        </div>
-                    </section>
-                ))}
-            </div>
+  const cardVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0 }
+  };
+  const listVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.06 } }
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 8 },
+    visible: { opacity: 1, y: 0 }
+  };
 
-            <section className="cta-section">
-                <div className="container text-center">
-                    <h2>¿Tienes un proyecto en mente?</h2>
-                    <p>Hablemos sobre cómo podemos ayudarte a realizarlo.</p>
-                    <Link to="/contacto" className="btn btn-outline-white">Contactar con Unamunzaga</Link>
-                </div>
-            </section>
-            
-            {/* DekorAI IA Editor */}
-            <section className="section">
-                <div className="container">
-                    <div className="section-header text-center">
-                        <h2 className="section-title">Rediseña tu espacio con IA</h2>
-                        <p className="section-subtitle">Edita tu espacio con IA en segundos usando DekorAI, ¡prueba el rediseño interactivo!</p>
-                    </div>
-                    <DekorAIEmbed
-                        src="https://dekorai.com/prueba-dekorai-gratis-en-tu-e-commerce-por-un-mes/#style-swapper"
-                        title="DekorAI IA Editor"
-                        height={800}
-                        allow="camera; microphone; fullscreen"
-                    />
-                </div>
-            </section>
+  const openModalFor = (service) => {
+    setSelectedService(service);
+    setCtaOpen(true);
+  };
+
+  const onSubmit = (data) => {
+    // Simulación de envío y feedback visual
+    setTimeout(() => {
+      setCtaOpen(false);
+      reset();
+      const message = `Hola, soy ${data.name}. Quiero presupuesto para ${selectedService?.title}. ${data.message}`;
+      const url = `https://wa.me/34612345678?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    }, 800);
+  };
+
+  
+
+  return (
+    <>
+      <ModernNavbar />
+      <div className="min-h-screen bg-white">
+      {/* Encabezado de página */}
+      <section className="bg-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">Nuestros Servicios</h1>
+          <p className="text-lg md:text-xl text-white/90">Soluciones profesionales para cada tipo de proyecto</p>
         </div>
-    );
+      </section>
+
+      
+
+      {/* Stats rápidos */}
+      <div className="bg-amber-50">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex flex-wrap gap-6 items-center justify-between">
+          <div className="flex items-center gap-3">
+            <BadgeCheck className="w-6 h-6 text-amber-500" />
+            <span className="font-semibold text-amber-700">+1000 obras finalizadas en Bilbao y Bizkaia</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Star className="w-6 h-6 text-amber-500" />
+            <span className="text-amber-700">Clientes particulares y profesionales confían en nosotros</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid de servicios */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {services.map((service) => {
+            const Icon = service.icon || Wrench;
+            return (
+              <motion.section
+                key={service.id}
+                id={service.id}
+                whileHover={{ y: -6, scale: 1.02 }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={cardVariants}
+                className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 group"
+              >
+                {/* Imagen */}
+                <div className="relative h-52">
+                  <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+                    {service.badges?.map((b) => (
+                      <span key={b} className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-900 text-white">
+                        {b}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Contenido */}
+                <div className="p-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-900 flex items-center justify-center animate-float">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900">{service.title}</h2>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">{service.description}</p>
+
+                  {/* Micro-caso de éxito */}
+                  {service.microStat && (
+                    <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                      <Sparkles className="w-4 h-4" />
+                      <span>{service.microStat}</span>
+                    </div>
+                  )}
+
+                  {/* Features */}
+                  <motion.ul className="space-y-2" variants={listVariants}>
+                    {service.features.map((feature, i) => (
+                      <motion.li key={i} className="flex items-start gap-2 text-gray-700" variants={itemVariants}>
+                        <Check className="w-4 h-4 text-amber-500 mt-0.5" /> {feature}
+                      </motion.li>
+                    ))}
+                  </motion.ul>
+
+                  {/* CTAs */}
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => openModalFor(service)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600 shadow-lg"
+                    >
+                      <MessageCircle className="w-4 h-4" /> Solicita tu presupuesto fácil
+                    </motion.button>
+
+                    <Link
+                      to="/proyectos"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-blue-200 text-blue-900 hover:bg-blue-50"
+                    >
+                      Explora proyectos <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.section>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Prueba social: logos/testimonios mini */}
+      <div className="max-w-7xl mx-auto px-4 pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
+          {[1,2,3,4].map((i) => (
+            <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} className="flex justify-center">
+              <img
+                src={`https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=client%20logo%20minimal%20blue%20and%20gray%20professional&image_size=square`}
+                alt={`Logo cliente ${i}`}
+                className="h-12 object-contain grayscale hover:grayscale-0 transition"
+              />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bloque asistente visual */}
+      <div className="bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">¿No sabes qué servicio necesitas?</h2>
+            <p className="text-gray-600">Elige tu perfil y te mostramos ejemplos y soluciones.</p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button className="px-6 py-3 rounded-xl bg-blue-900 text-white hover:bg-blue-800">Soy particular</button>
+            <button className="px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300">Soy arquitecto / profesional</button>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA inferior */}
+      <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-amber-600 py-16">
+        <div className="max-w-7xl mx-auto px-4 text-center text-white">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">¿Tienes un proyecto en mente?</h2>
+          <p className="text-white/90 mb-6">Hablemos sobre cómo podemos ayudarte a realizarlo.</p>
+          <button onClick={() => setCtaOpen(true)} className="btn btn-outline-white">Contactar con Unamunzaga</button>
+        </div>
+      </section>
+
+      {/* Editor IA existente */}
+      <section className="section">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2 className="section-title">Rediseña tu espacio con IA</h2>
+            <p className="section-subtitle">Edita tu espacio con IA en segundos usando DekorAI, ¡prueba el rediseño interactivo!</p>
+          </div>
+          <DekorAIEmbed
+            src="https://dekorai.com/prueba-dekorai-gratis-en-tu-e-commerce-por-un-mes/#style-swapper"
+            title="DekorAI IA Editor"
+            height={800}
+            allow="camera; microphone; fullscreen"
+          />
+        </div>
+      </section>
+
+      {/* Modal CTA */}
+      <AnimatePresence>
+        {ctaOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/50 backdrop-blur" onClick={() => setCtaOpen(false)}>
+            <motion.div initial={{ scale: 0.95, y: -20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: -20 }} className="max-w-lg w-full mx-auto bg-white rounded-2xl shadow-2xl mt-24 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900">Solicita tu presupuesto</h3>
+                <p className="text-gray-600">Te asesoramos sin coste. Servicio seleccionado: <span className="font-semibold">{selectedService?.title || 'General'}</span></p>
+              </div>
+              <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+                <div>
+                  <label className="text-sm text-gray-700">Nombre *</label>
+                  <input className={`w-full px-4 py-3 border rounded-lg ${errors.name ? 'border-red-500' : 'border-gray-300'}`} {...register('name', { required: 'Tu nombre es obligatorio' })} placeholder="Tu nombre" />
+                  {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
+                </div>
+                <div>
+                  <label className="text-sm text-gray-700">Email *</label>
+                  <input className={`w-full px-4 py-3 border rounded-lg ${errors.email ? 'border-red-500' : 'border-gray-300'}`} {...register('email', { required: 'Email obligatorio' })} placeholder="tu@email.com" />
+                  {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>}
+                </div>
+                <div>
+                  <label className="text-sm text-gray-700">Descripción breve *</label>
+                  <textarea rows={3} className={`w-full px-4 py-3 border rounded-lg ${errors.message ? 'border-red-500' : 'border-gray-300'}`} {...register('message', { required: 'Cuéntanos brevemente tu necesidad' })} placeholder="Cuéntanos sobre tu proyecto" />
+                  {errors.message && <p className="text-sm text-red-600 mt-1">{errors.message.message}</p>}
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button type="submit" className="px-6 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 inline-flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5" /> Enviar solicitud
+                  </button>
+                  <button type="button" onClick={() => setCtaOpen(false)} className="px-6 py-3 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300">Cerrar</button>
+                  <a href="tel:+34612345678" className="px-4 py-3 rounded-xl bg-blue-900 text-white inline-flex items-center gap-2"><Phone className="w-4 h-4" /> Llamar</a>
+                  <a href="mailto:info@unamunzagaobras.com" className="px-4 py-3 rounded-xl bg-gray-700 text-white inline-flex items-center gap-2"><Mail className="w-4 h-4" /> Email</a>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </div>
+    <ModernFooter />
+    </>
+  );
 };
 
 export default Services;

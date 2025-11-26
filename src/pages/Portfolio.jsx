@@ -1,3 +1,5 @@
+import { ModernNavbar } from '../components/layout/ModernNavbar';
+import ModernFooter from '../components/layout/ModernFooter';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProjectCard from '../components/portfolio/ProjectCard';
@@ -57,7 +59,9 @@ const Portfolio = () => {
         : projects.filter(project => project.category === filter);
 
     return (
-        <div className="page portfolio-page">
+        <>
+            <ModernNavbar />
+            <div className="page portfolio-page">
             <section className="page-header">
                 <div className="container">
                     <h1 className="animate-fade-in">Nuestros Proyectos</h1>
@@ -123,6 +127,8 @@ const Portfolio = () => {
                 </div>
             </section>
         </div>
+        <ModernFooter />
+        </>
     );
 };
 

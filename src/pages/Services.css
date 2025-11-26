@@ -83,6 +83,16 @@
     margin-top: 2rem;
 }
 
+@keyframes floatSlow {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+    100% { transform: translateY(0); }
+}
+
+.animate-float {
+    animation: floatSlow 3s ease-in-out infinite;
+}
+
 @media (max-width: 900px) {
 
     .service-section,

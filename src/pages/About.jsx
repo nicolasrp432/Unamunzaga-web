@@ -1,77 +1,310 @@
-import { AnimatedTestimonials } from '../components/ui/AnimatedTestimonials';
+import { ModernNavbar } from '../components/layout/ModernNavbar';
+import ModernFooter from '../components/layout/ModernFooter';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { 
+  Award, 
+  Users, 
+  Calendar, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  CheckCircle,
+  Star,
+  Briefcase,
+  Heart,
+  Shield,
+  Target
+} from 'lucide-react';
+import teamData from '../data/team.json';
 import './About.css';
 
-const teamMembers = [
-    {
-        quote: "La arquitectura es el arte de organizar el espacio. Nuestro objetivo es crear lugares que inspiren y mejoren la vida de las personas.",
-        name: "Elena García",
-        title: "Arquitecta Principal",
-        image: "https://randomuser.me/api/portraits/women/68.jpg",
-    },
-    {
-        quote: "Cada proyecto es un nuevo reto. Me apasiona encontrar soluciones creativas y funcionales que superen las expectativas de nuestros clientes.",
-        name: "Javier Rodríguez",
-        title: "Diseñador de Interiores",
-        image: "https://randomuser.me/api/portraits/men/75.jpg",
-    },
-    {
-        quote: "La buena gestión de obra es la clave para cumplir plazos y presupuestos. Mi trabajo es asegurar que todo funcione como un reloj.",
-        name: "Carlos Martínez",
-        title: "Jefe de Obra",
-        image: "https://randomuser.me/api/portraits/men/62.jpg",
-    },
-    {
-        quote: "La calidad está en los detalles. Me aseguro de que cada acabado sea perfecto y de que los materiales sean de la mejor calidad.",
-        name: "Laura Fernández",
-        title: "Supervisora de Calidad",
-        image: "https://randomuser.me/api/portraits/women/44.jpg",
-    },
-];
-
 const About = () => {
-    return (
-        <div className="page about-page">
-            <section className="page-header">
-                <div className="container">
-                    <h1>Sobre Nosotros</h1>
-                    <p>Más de dos décadas construyendo confianza en Bilbao</p>
-                </div>
-            </section>
+  const companyStats = [
+    { number: '15+', label: 'Años de Experiencia', icon: Calendar },
+    { number: '200+', label: 'Proyectos Completados', icon: Briefcase },
+    { number: '50+', label: 'Clientes Satisfechos', icon: Users },
+    { number: '10+', label: 'Premios y Reconocimientos', icon: Award }
+  ];
 
-            <section className="section story-section">
-                <div className="container story-grid">
-                    <div className="story-content">
-                        <h2>Nuestra Historia</h2>
-                        <p>Fundada en el año 2000, Unamunzaga Obras nació con una misión clara: ofrecer servicios de reforma integral que combinen la excelencia técnica con un trato cercano y transparente.</p>
-                        <p>A lo largo de estos más de 20 años, hemos crecido gracias a la confianza de nuestros clientes en Bilbao y alrededores. Lo que comenzó como una pequeña empresa familiar se ha convertido en un referente en el sector, manteniendo siempre nuestros valores fundacionales.</p>
-                        <p>Nos enorgullece decir que gran parte de nuestro trabajo proviene de recomendaciones de clientes satisfechos, lo cual es nuestro mayor sello de calidad.</p>
-                    </div>
-                    <div className="story-image">
-                        <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1000&auto=format&fit=crop" alt="Equipo trabajando en planos" />
-                    </div>
-                </div>
-            </section>
+  const companyValues = [
+    {
+      icon: Heart,
+      title: 'Pasión por el Diseño',
+      description: 'Amamos lo que hacemos y eso se refleja en cada proyecto que realizamos. Cada espacio es una obra de arte funcional.'
+    },
+    {
+      icon: Shield,
+      title: 'Calidad Garantizada',
+      description: 'Utilizamos solo los mejores materiales y trabajamos con los profesionales más cualificados del sector.'
+    },
+    {
+      icon: Target,
+      title: 'Compromiso con el Cliente',
+      description: 'Tu satisfacción es nuestra prioridad. Trabajamos contigo en cada paso para asegurarnos de que tu visión se haga realidad.'
+    }
+  ];
 
-            <section className="section team-section">
-                <div className="container">
-                    <h2 className="section-title text-center">Nuestro Equipo</h2>
-                    <p className="text-center mb-lg" style={{ maxWidth: '700px', margin: '0 auto 2rem' }}>
-                        Contamos con un equipo multidisciplinar de arquitectos, interioristas, jefes de obra y operarios especializados, listos para hacer realidad tu proyecto.
-                    </p>
-                    <AnimatedTestimonials items={teamMembers} />
-                </div>
-            </section>
+  const processSteps = [
+    {
+      step: '01',
+      title: 'Consulta Inicial',
+      description: 'Nos reunimos contigo para entender tus necesidades, preferencias y presupuesto.'
+    },
+    {
+      step: '02',
+      title: 'Diseño y Planificación',
+      description: 'Creamos un diseño personalizado que maximice el potencial de tu espacio.'
+    },
+    {
+      step: '03',
+      title: 'Ejecución del Proyecto',
+      description: 'Nuestro equipo de profesionales lleva a cabo la obra con la máxima calidad y eficiencia.'
+    },
+    {
+      step: '04',
+      title: 'Entrega y Seguimiento',
+      description: 'Entregamos tu proyecto terminado y nos aseguramos de que estés completamente satisfecho.'
+    }
+  ];
 
-            <section className="cta-section">
-                <div className="container text-center">
-                    <h2>¿Quieres conocernos mejor?</h2>
-                    <p>Ven a visitarnos o contáctanos para hablar de tu proyecto.</p>
-                    <Link to="/contacto" className="btn btn-outline-white">Contactar</Link>
-                </div>
-            </section>
+  return (
+    <>
+      <ModernNavbar />
+      <div className="page about-page">
+      {/* Hero Section */}
+      <section className="about-hero">
+        <div className="container">
+          <div className="hero-content">
+            <h1>Sobre Nosotros</h1>
+            <p>Transformamos espacios, creamos hogares y construimos sueños en Bizkaia desde 2009</p>
+          </div>
         </div>
-    );
+      </section>
+
+      {/* Company Stats */}
+      <section className="company-stats">
+        <div className="container">
+          <div className="stats-grid">
+            {companyStats.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div key={index} className="stat-card">
+                  <div className="stat-icon">
+                    <Icon size={32} />
+                  </div>
+                  <div className="stat-number">{stat.number}</div>
+                  <div className="stat-label">{stat.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Company Story */}
+      <section className="company-story">
+        <div className="container">
+          <div className="story-grid">
+            <div className="story-content">
+              <h2>Nuestra Historia</h2>
+              <p>
+                Fundada en 2009 en Bilbao, Unamunzaga nació de la pasión por transformar espacios y crear ambientes 
+                que inspiren y mejoren la calidad de vida de las personas. A lo largo de más de 15 años, hemos 
+                convertido cientos de hogares y locales en espacios funcionales, modernos y acogedores.
+              </p>
+              <p>
+                Nuestro equipo de profesionales altamente cualificados combina experiencia, innovación y atención 
+                al detalle para ofrecer soluciones personalizadas que superan las expectativas de nuestros clientes.
+              </p>
+              <div className="story-highlights">
+                <div className="highlight-item">
+                  <CheckCircle size={20} className="highlight-icon" />
+                  <span>Más de 15 años de experiencia en el sector</span>
+                </div>
+                <div className="highlight-item">
+                  <CheckCircle size={20} className="highlight-icon" />
+                  <span>Especialistas en reformas integrales y parciales</span>
+                </div>
+                <div className="highlight-item">
+                  <CheckCircle size={20} className="highlight-icon" />
+                  <span>Compromiso con la calidad y el plazo de entrega</span>
+                </div>
+                <div className="highlight-item">
+                  <CheckCircle size={20} className="highlight-icon" />
+                  <span>Atención personalizada en cada proyecto</span>
+                </div>
+              </div>
+            </div>
+            <div className="story-image">
+              <img 
+                src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Professional%20construction%20team%20working%20together%20on%20a%20modern%20reform%20project%2C%20wearing%20safety%20equipment%2C%20high%20quality%20lighting%2C%20architectural%20setting&image_size=landscape_16_9" 
+                alt="Equipo de profesionales de Unamunzaga trabajando"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Company Values */}
+      <section className="company-values">
+        <div className="container">
+          <h2 className="section-title">Nuestros Valores</h2>
+          <div className="values-grid">
+            {companyValues.map((value, index) => {
+              const Icon = value.icon;
+              return (
+                <div key={index} className="value-card">
+                  <div className="value-icon">
+                    <Icon size={48} />
+                  </div>
+                  <h3>{value.title}</h3>
+                  <p>{value.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Our Process */}
+      <section className="our-process">
+        <div className="container">
+          <h2 className="section-title">Nuestro Proceso de Trabajo</h2>
+          <div className="process-timeline">
+            {processSteps.map((step, index) => (
+              <div key={index} className="process-step">
+                <div className="step-number">{step.step}</div>
+                <div className="step-content">
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="team-section">
+        <div className="container">
+          <h2 className="section-title">Nuestro Equipo</h2>
+          <p className="section-subtitle">
+            Conoce a los profesionales que hacen posible cada proyecto
+          </p>
+          <div className="team-grid">
+            {teamData.map((member) => (
+              <div key={member.id} className="team-card">
+                <div className="team-image">
+                  <img 
+                    src={member.image} 
+                    alt={member.name}
+                    loading="lazy"
+                  />
+                </div>
+                <div className="team-info">
+                  <h3>{member.name}</h3>
+                  <p className="team-role">{member.position}</p>
+                  <p className="team-experience">{member.experience}</p>
+                  {(() => {
+                    const specialties = Array.isArray(member.specialties)
+                      ? member.specialties.slice(0, 3)
+                      : (member.specialization
+                          ? member.specialization.split(/,\s*|\s+y\s+/).slice(0, 3)
+                          : []);
+                    return specialties.length > 0 ? (
+                      <div className="team-specialties">
+                        {specialties.map((specialty, index) => (
+                          <span key={index} className="specialty-tag">
+                            {specialty}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null;
+                  })()}
+                  {member.description && (
+                    <p className="team-bio">{member.description}</p>
+                  )}
+                  <div className="team-contact">
+                    {member.phone && (
+                      <a href={`tel:${member.phone}`} className="contact-link">
+                        <Phone size={16} />
+                      </a>
+                    )}
+                    {member?.social?.email && (
+                      <a href={`mailto:${member.social.email}`} className="contact-link">
+                        <Mail size={16} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Certifications and Awards */}
+      <section className="certifications">
+        <div className="container">
+          <h2 className="section-title">Certificaciones y Reconocimientos</h2>
+          <div className="certifications-grid">
+            <div className="cert-item">
+              <Star size={32} className="cert-icon" />
+              <h3>Certificación ISO 9001</h3>
+              <p>Sistema de gestión de calidad certificado</p>
+            </div>
+            <div className="cert-item">
+              <Award size={32} className="cert-icon" />
+              <h3>Mejor Empresa de Reformas 2022</h3>
+              <p>Premio otorgado por la Cámara de Comercio de Bizkaia</p>
+            </div>
+            <div className="cert-item">
+              <Shield size={32} className="cert-icon" />
+              <h3>Seguridad en el Trabajo</h3>
+              <p>Certificados en prevención de riesgos laborales</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact CTA */}
+      <section className="contact-cta-section">
+        <div className="container">
+          <div className="cta-content">
+            <h2>¿Listo para transformar tu espacio?</h2>
+            <p>
+              Contáctanos hoy mismo para una consulta gratuita. Estamos aquí para ayudarte a hacer realidad 
+              el hogar o negocio de tus sueños.
+            </p>
+            <div className="cta-buttons">
+              <Link to="/contacto" className="btn btn-primary btn-lg">
+                <Phone size={20} />
+                Solicitar Consulta
+              </Link>
+              <div className="contact-info">
+                <div className="contact-item">
+                  <Phone size={16} />
+                  <span>666 123 456</span>
+                </div>
+                <div className="contact-item">
+                  <Mail size={16} />
+                  <span>info@unamunzaga.com</span>
+                </div>
+                <div className="contact-item">
+                  <MapPin size={16} />
+                  <span>Bilbao, Bizkaia</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <ModernFooter />
+    </>
+  );
 };
 
 export default About;

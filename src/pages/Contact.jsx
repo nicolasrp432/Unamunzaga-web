@@ -1,3 +1,5 @@
+import { ModernNavbar } from '../components/layout/ModernNavbar';
+import ModernFooter from '../components/layout/ModernFooter';
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -45,8 +47,19 @@ const Contact = () => {
         }
     };
 
-    return (
-        <div className="page contact-page">
+  return (
+    <>
+      <ModernNavbar />
+      <div className="page contact-page">
+      <section className="map-fullscreen">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2903.038043258774!2d-2.925289684523449!3d43.26377907913515!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd4e4fd0f9a3c6b7%3A0x9e8c4e8e5b2c1d3f!2sCalle%20Licenciado%20Poza%2C%2030%2C%2048011%20Bilbao%2C%20Vizcaya!5e0!3m2!1ses!2ses!4v1234567890123!5m2!1ses!2ses"
+          allowFullScreen=""
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Ubicación de Unamunzaga Obras en Bilbao"
+        ></iframe>
+      </section>
             <section className="page-header">
                 <div className="container">
                     <h1>Contacta con Nosotros</h1>
@@ -55,10 +68,10 @@ const Contact = () => {
             </section>
 
             <section className="section contact-section">
-                <div className="container contact-grid">
-                    <div className="contact-info">
-                        <h2>Información de Contacto</h2>
-                        <p className="mb-md">Visítanos en nuestras oficinas o llámanos para concertar una cita.</p>
+              <div className="container contact-grid">
+                <div className="contact-info">
+                  <h2>Información de Contacto</h2>
+                  <p className="mb-md">Visítanos en nuestras oficinas o llámanos para concertar una cita.</p>
 
                         <div className="info-item">
                             <div className="icon-box-sm"><Phone size={20} /></div>
@@ -84,19 +97,8 @@ const Contact = () => {
                             </div>
                         </div>
 
-                        <div className="map-container">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d46485.67912367683!2d-2.9636976685424805!3d43.263012599999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd4e4e27664b89b9%3A0x653456329637000!2sBilbao%2C%20Biscay!5e0!3m2!1sen!2ses!4v1716543210987!5m2!1sen!2ses"
-                                width="100%"
-                                height="300"
-                                style={{ border: 0 }}
-                                allowFullScreen=""
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                title="Google Maps"
-                            ></iframe>
-                        </div>
-                    </div>
+                    
+                </div>
 
                     <div className="contact-form-container">
                         <h2>Envíanos un Mensaje</h2>
@@ -190,7 +192,9 @@ const Contact = () => {
                 </div>
             </section>
         </div>
+        <ModernFooter />
+      </>
     );
-};
+  };
 
 export default Contact;
