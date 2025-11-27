@@ -63,7 +63,7 @@
 
 .service-image {
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     height: 400px;
 }
@@ -73,6 +73,7 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
+    border-radius: 8px;
 }
 
 .service-image:hover img {
@@ -106,5 +107,87 @@
         height: 300px;
         order: -1;
         /* Image first on mobile */
+    }
+}
+
+/* Cards redesign */
+.service-card {
+    position: relative;
+}
+
+.service-image {
+    position: relative;
+}
+
+.service-icon-badge {
+    position: absolute;
+    left: 50%;
+    bottom: -28px;
+    transform: translateX(-50%);
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: 3px solid #e5e7eb;
+    transition: transform 0.3s ease;
+    z-index: 20;
+}
+
+.service-card:hover .service-icon-badge {
+    transform: translateX(-50%) scale(1.05);
+}
+
+/* Contact banner */
+.contact-banner {
+    background: #f8fafc;
+}
+
+/* Newsletter signup */
+.newsletter-section {
+    padding: 60px 0;
+    background: #0b1d4e;
+    color: white;
+}
+
+.newsletter-content {
+    text-align: center;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 12px;
+    max-width: 420px;
+    margin: 20px auto 0;
+}
+
+.newsletter-form input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+}
+
+.newsletter-form button {
+    padding: 14px 24px;
+    border-radius: 10px;
+    border: none;
+    background: var(--color-accent);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.newsletter-form button:hover {
+    filter: brightness(1.05);
+}
+
+@media (max-width: 768px) {
+    .newsletter-form {
+        flex-direction: column;
     }
 }

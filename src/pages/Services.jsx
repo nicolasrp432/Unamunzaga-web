@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import DekorAIEmbed from '../components/integrations/DekorAIEmbed';
 import './Services.css';
+import { CTASection } from '../components/sections/CTASection';
+import NewsletterSignup from '../components/sections/NewsletterSignup';
 
 const Services = () => {
   const services = [
@@ -343,6 +345,28 @@ const Services = () => {
   const [ctaOpen, setCtaOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const quickFilters = [
+    'all',
+    'viviendas',
+    'cocinas',
+    'baños',
+    'locales',
+    'fachadas',
+    'reformas',
+    'insonorizacion',
+    'impermeabilizacion',
+    'rehabilitaciones',
+    'accesibilidad'
+  ];
+  const filteredServices = useMemo(() => {
+    if (selectedFilter === 'all') return services;
+    const cat = selectedFilter.toLowerCase();
+    return services.filter(
+      (s) => s.id.toLowerCase().includes(cat) || s.title.toLowerCase().includes(cat)
+    );
+  }, [services, selectedFilter]);
+  
 
   const cardVariants = {
     hidden: { opacity: 0, y: 16 },
@@ -380,10 +404,25 @@ const Services = () => {
       <ModernNavbar />
       <div className="min-h-screen bg-white">
       {/* Encabezado de página */}
-      <section className="bg-blue-900 text-white py-16">
+      <section className="bg-blue-900 text-white py-24 md:py-28">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">Nuestros Servicios</h1>
-          <p className="text-lg md:text-xl text-white/90">Soluciones profesionales para cada tipo de proyecto</p>
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 tracking-tight">Nuestros Servicios</h1>
+          <p className="text-lg md:text-xl text-white/90 mb-8">Soluciones profesionales para cada tipo de proyecto</p>
+
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6">
+            <div className="flex flex-wrap gap-2">
+              {quickFilters.map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setSelectedFilter(selectedFilter === f ? 'all' : f)}
+                  className={`px-3 py-2 rounded-full text-sm font-semibold transition-all ${selectedFilter === f ? 'bg-amber-500 text-white' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                >
+                  {f === 'all' ? 'Todos' : f}
+                </button>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -406,7 +445,7 @@ const Services = () => {
       {/* Grid de servicios */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service) => {
+          {filteredServices.map((service) => {
             const Icon = service.icon || Wrench;
             return (
               <motion.section
@@ -417,10 +456,10 @@ const Services = () => {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
                 variants={cardVariants}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 group"
+                className="service-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 group"
               >
                 {/* Imagen */}
-                <div className="relative h-52">
+                <div className="relative h-52 service-image">
                   <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
@@ -430,16 +469,15 @@ const Services = () => {
                       </span>
                     ))}
                   </div>
+                  {/* Icono centrado */}
+                  <div className="service-icon-badge">
+                    <Icon className="w-10 h-10" />
+                  </div>
                 </div>
 
                 {/* Contenido */}
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-900 flex items-center justify-center animate-float">
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <h2 className="text-xl font-bold text-gray-900">{service.title}</h2>
-                  </div>
+                <div className="p-6 space-y-4 pt-20">
+                  <h2 className="text-xl font-bold text-gray-900 text-center">{service.title}</h2>
                   <p className="text-gray-600 leading-relaxed">{service.description}</p>
 
                   {/* Micro-caso de éxito */}
@@ -513,14 +551,29 @@ const Services = () => {
         </div>
       </div>
 
-      {/* CTA inferior */}
-      <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-amber-600 py-16">
-        <div className="max-w-7xl mx-auto px-4 text-center text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">¿Tienes un proyecto en mente?</h2>
-          <p className="text-white/90 mb-6">Hablemos sobre cómo podemos ayudarte a realizarlo.</p>
-          <button onClick={() => setCtaOpen(true)} className="btn btn-outline-white">Contactar con Unamunzaga</button>
+      {/* Banner de contacto con imagen */}
+      <section className="contact-banner">
+        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div className="rounded-2xl overflow-hidden shadow-lg">
+            <img src="/fondounamunzaga.jpg" alt="Equipo Unamunzaga" className="w-full h-80 object-cover" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">¿Tienes un problema? Lo solucionamos hoy</h2>
+            <p className="text-gray-600 mb-6">Llámanos o escríbenos y te asesoramos sin compromiso.</p>
+            <div className="flex flex-wrap gap-3">
+              <a href="tel:+34944231213" className="px-5 py-3 rounded-xl bg-blue-900 text-white inline-flex items-center gap-2"><Phone className="w-5 h-5" /> +34 944 231 213</a>
+              <a href="mailto:info@unamunzagaobras.com" className="px-5 py-3 rounded-xl bg-gray-700 text-white inline-flex items-center gap-2"><Mail className="w-5 h-5" /> info@unamunzagaobras.com</a>
+              <button onClick={() => setCtaOpen(true)} className="px-5 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600">Solicitar presupuesto</button>
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* Componente de contacto reutilizable */}
+      <CTASection />
+
+      {/* Suscripción a newsletter */}
+      <NewsletterSignup />
 
       {/* Editor IA existente */}
       <section className="section">

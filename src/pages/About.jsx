@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import teamData from '../data/team.json';
 import './About.css';
+import ClientTrust from '../components/sections/ClientTrust';
 
 const About = () => {
   const companyStats = [
@@ -66,6 +67,18 @@ const About = () => {
       title: 'Entrega y Seguimiento',
       description: 'Entregamos tu proyecto terminado y nos aseguramos de que estés completamente satisfecho.'
     }
+  ];
+
+  const clientLogos = [
+    '/creen/imgi_10_estudios-9.png',
+    '/creen/imgi_11_estudios-8 (1).png',
+    '/creen/imgi_11_estudios-8.png',
+    '/creen/imgi_12_estudios-7.png',
+    '/creen/imgi_13_estudios-6.png',
+    '/creen/imgi_14_estudios-5.png',
+    '/creen/imgi_15_estudios-4.png',
+    '/creen/imgi_16_estudios-2.png',
+    '/creen/imgi_17_estudios-1.png',
   ];
 
   return (
@@ -268,6 +281,8 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      <ClientTrust images={clientLogos} />
 
       {/* Contact CTA */}
       <section className="contact-cta-section">
