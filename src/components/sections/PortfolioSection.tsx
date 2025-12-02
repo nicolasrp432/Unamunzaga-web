@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Project } from '../../types';
 import { 
-  Star, 
   Calendar, 
   MapPin, 
   ExternalLink, 
@@ -13,22 +11,42 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
+export type ProjectData = {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  location: string;
+  year: number;
+  duration: string;
+  budget: string;
+  images: string[];
+  testimonial?: string;
+  client_name?: string;
+  featured?: boolean;
+  kuulaSrc?: string;
+};
+
 interface PortfolioSectionProps {
-  projects: Project[];
+  projects: ProjectData[];
 }
 
 export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const categories = ['Todos', ...Array.from(new Set(projects.map(p => p.category)))];
+  const categories = useMemo(() => ['Todos', ...Array.from(new Set(projects.map(p => p.category)))], [projects]);
   
-  const filteredProjects = selectedCategory === 'Todos' 
-    ? projects 
-    : projects.filter(p => p.category === selectedCategory);
+  const filteredProjects = useMemo(() => (
+    selectedCategory === 'Todos' ? projects : projects.filter(p => p.category === selectedCategory)
+  ), [projects, selectedCategory]);
 
-  const featuredProjects = projects.filter(p => p.featured);
+  const featuredProjects = useMemo(() => projects.filter(p => p.featured), [projects]);
+
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [selectedProject]);
 
   return (
     <section id="portfolio" className="py-20 bg-gray-50">
@@ -76,25 +94,13 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                           DESTACADO
                         </span>
                       </div>
-                      {project.tags.includes('PREMIUM') && (
-                        <div className="absolute top-4 right-4">
-                          <span className="bg-blue-900 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                            PREMIUM
-                          </span>
-                        </div>
-                      )}
                     </div>
                     <div className="p-6">
                       <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
                       <p className="text-gray-600 mb-4 line-clamp-2">{project.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-blue-900 font-semibold">{project.category}</span>
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-amber-500 fill-current" />
-                          <span className="text-gray-600 text-sm">
-                            {project.testimonial?.rating || 5}
-                          </span>
-                        </div>
+                        <span className="text-gray-600 text-sm">📅 {project.year}</span>
                       </div>
                     </div>
                   </motion.div>
@@ -159,24 +165,11 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
-                  {/* Tags */}
-                  <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className={cn(
-                          'px-2 py-1 rounded-full text-xs font-semibold',
-                          tag === 'PREMIUM'
-                            ? 'bg-amber-500 text-white'
-                            : tag === 'HISTÓRICO'
-                            ? 'bg-green-600 text-white'
-                            : 'bg-blue-900 text-white'
-                        )}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                <div className="absolute top-4 left-4">
+                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-900 text-white">
+                    {project.category}
+                  </span>
+                </div>
 
                   {/* Hover Overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -197,31 +190,17 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-4 h-4" />
-                      <span>{new Date(project.completion_date).toLocaleDateString('es-ES')}</span>
+                      <span>{project.year}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <MapPin className="w-4 h-4" />
-                      <span>Bilbao</span>
+                      <span>{project.location}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-blue-900 font-semibold">{project.category}</span>
-                    {project.testimonial && (
-                      <div className="flex items-center space-x-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={cn(
-                              'w-4 h-4',
-                              i < project.testimonial!.rating
-                                ? 'text-amber-500 fill-current'
-                                : 'text-gray-300'
-                            )}
-                          />
-                        ))}
-                      </div>
-                    )}
+                    <span className="text-gray-600">{project.duration}</span>
                   </div>
                 </div>
               </motion.div>
@@ -272,13 +251,17 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                   <>
                     <button
                       onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : selectedProject.images.length - 1)}
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors z-20"
+                      aria-label="Anterior imagen"
+                      type="button"
                     >
                       <ChevronLeft className="w-6 h-6 text-gray-800" />
                     </button>
                     <button
                       onClick={() => setCurrentImageIndex(prev => prev < selectedProject.images.length - 1 ? prev + 1 : 0)}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors z-20"
+                      aria-label="Siguiente imagen"
+                      type="button"
                     >
                       <ChevronRight className="w-6 h-6 text-gray-800" />
                     </button>
@@ -313,77 +296,31 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                     <p className="font-semibold text-gray-900">{selectedProject.category}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-gray-500">Estado</span>
-                    <p className="font-semibold text-gray-900 capitalize">{selectedProject.status}</p>
+                    <span className="text-sm text-gray-500">Ubicación</span>
+                    <p className="font-semibold text-gray-900">{selectedProject.location}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-gray-500">Fecha</span>
-                    <p className="font-semibold text-gray-900">
-                      {new Date(selectedProject.completion_date).toLocaleDateString('es-ES')}
-                    </p>
+                    <span className="text-sm text-gray-500">Año</span>
+                    <p className="font-semibold text-gray-900">{selectedProject.year}</p>
                   </div>
-                  {selectedProject.budget && (
-                    <div>
-                      <span className="text-sm text-gray-500">Presupuesto</span>
-                      <p className="font-semibold text-gray-900">
-                        {selectedProject.budget.toLocaleString('es-ES')}€
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <span className="text-sm text-gray-500">Presupuesto</span>
+                    <p className="font-semibold text-gray-900">{selectedProject.budget}</p>
+                  </div>
                 </div>
 
                 {selectedProject.testimonial && (
                   <div className="bg-blue-50 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Testimonio del Cliente</h3>
-                    <div className="flex items-start space-x-4">
-                      {selectedProject.testimonial.avatar_url && (
-                        <img
-                          src={selectedProject.testimonial.avatar_url}
-                          alt={selectedProject.testimonial.client_name}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                      )}
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-1 mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={cn(
-                                'w-4 h-4',
-                                i < selectedProject.testimonial!.rating
-                                  ? 'text-amber-500 fill-current'
-                                  : 'text-gray-300'
-                              )}
-                            />
-                          ))}
-                        </div>
-                        <p className="text-gray-700 mb-2">{selectedProject.testimonial.testimonial_text}</p>
-                        <div className="text-sm text-gray-600">
-                          <span className="font-semibold">{selectedProject.testimonial.client_name}</span>
-                          {selectedProject.testimonial.company && (
-                            <span> - {selectedProject.testimonial.company}</span>
-                          )}
-                        </div>
+                    <blockquote className="text-gray-700 mb-2">“{selectedProject.testimonial}”</blockquote>
+                    {selectedProject.client_name && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-semibold">{selectedProject.client_name}</span>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
-
-                {selectedProject.tags.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Etiquetas</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProject.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                
               </div>
             </motion.div>
           </motion.div>

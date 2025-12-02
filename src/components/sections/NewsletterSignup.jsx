@@ -29,6 +29,8 @@ const NewsletterSignup = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               aria-label="Correo electrónico"
+              inputMode="email"
+              autoComplete="email"
             />
             <button type="submit" disabled={status === 'loading'}>
               {status === 'loading' ? 'Enviando…' : 'Suscribirme'}

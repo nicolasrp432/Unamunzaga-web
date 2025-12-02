@@ -16,7 +16,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   title = 'Unamunzaga Obras - Reformas y Construcción en Bilbao',
   description = 'Más de 20 años de experiencia en reformas integrales, obra nueva y rehabilitación en Bilbao. Presupuestos sin compromiso. Servicios profesionales de construcción.',
   keywords = ['reformas Bilbao', 'construcción Bilbao', 'reformas integrales', 'obra nueva', 'rehabilitación', 'Unamunzaga Obras'],
-  image = 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Modern%20construction%20company%20logo%20with%20professional%20blue%20and%20white%20design%2C%20clean%20typography%2C%20building%20elements%2C%20Spanish%20Basque%20style&image_size=square',
+  image = 'https://unamunzagaobras.com/home/wp-content/uploads/2020/12/casco-viejo-ITURRIBIDE-7.jpg',
   url = 'https://unamunzagaobras.com',
   type = 'website',
   locale = 'es_ES',

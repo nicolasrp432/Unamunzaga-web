@@ -13,17 +13,32 @@ const ClientTrust = ({
     '/creen/imgi_16_estudios-2.png',
     '/creen/imgi_17_estudios-1.png',
   ],
-  speed = 24,
   height = 120,
 }) => {
+  const normalizeKey = (src) => src.replace(/\s*\(\d+\)\s*/g, '');
+  const unique = images.filter((src, index, self) =>
+    self.findIndex((s) => normalizeKey(s) === normalizeKey(src)) === index
+  );
+
+  const mid = Math.ceil(unique.length / 2);
+  const row1 = unique.slice(0, mid);
+  const row2 = unique.slice(mid);
+
   return (
     <section className="client-trust">
       <div className="container">
         <h2 className="trust-title">{title}</h2>
-        <div className="logos-marquee">
-          <div className="marquee-track" style={{ animationDuration: `${speed}s` }}>
-            {images.map((src, i) => (
-              <div className="logo-item" key={`${src}-${i}`}>
+        <div className="logos-rows">
+          <div className="logos-row">
+            {row1.map((src) => (
+              <div className="logo-item" key={src}>
+                <img src={src} alt="Logo de cliente" loading="lazy" style={{ height }} />
+              </div>
+            ))}
+          </div>
+          <div className="logos-row">
+            {row2.map((src) => (
+              <div className="logo-item" key={src}>
                 <img src={src} alt="Logo de cliente" loading="lazy" style={{ height }} />
               </div>
             ))}

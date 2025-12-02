@@ -59,6 +59,6 @@ export interface KPI {
 export interface NavigationItem {
   label: string;
   href: string;
-  icon?: React.ComponentType<any>;
+  icon?: React.ComponentType<unknown>;
   submenu?: NavigationItem[];
 }

@@ -161,6 +161,31 @@
   padding: 0 1rem;
 }
 
+.view-toggle {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.view-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-btn.active {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.view-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 .main-image {
   position: relative;
   width: 100%;

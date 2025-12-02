@@ -18,6 +18,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import projectsData from '../data/projects.json';
+import KuulaTour, { DEFAULT_KUULA_SRC, SAMPLE_COLLECTION_SRC } from '../components/kuula/KuulaTour';
 import './ProjectDetail.css';
 
 const ProjectDetail = () => {
@@ -26,6 +27,7 @@ const ProjectDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState('images');
 
   useEffect(() => {
     const foundProject = projectsData.find(p => p.id === parseInt(id));
@@ -36,6 +38,12 @@ const ProjectDetail = () => {
       setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    if (window.location && window.location.hash === '#tour') {
+      setViewMode('tour');
+    }
+  }, []);
 
   const nextImage = () => {
     if (project && project.images.length > 1) {
@@ -141,49 +149,76 @@ const ProjectDetail = () => {
         </div>
       </section>
 
-      {/* Image Gallery */}
+      {/* Media Gallery */}
       <section className="project-gallery">
         <div className="container">
           <div className="gallery-container">
-            <div className="main-image">
-              <img 
-                src={project.images[currentImageIndex]} 
-                alt={`${project.title} - Imagen ${currentImageIndex + 1}`}
-                loading="lazy"
-              />
-              {project.images.length > 1 && (
-                <>
-                  <button 
-                    className="gallery-nav prev"
-                    onClick={prevImage}
-                    aria-label="Imagen anterior"
-                  >
-                    <ChevronLeft size={24} />
-                  </button>
-                  <button 
-                    className="gallery-nav next"
-                    onClick={nextImage}
-                    aria-label="Imagen siguiente"
-                  >
-                    <ChevronRight size={24} />
-                  </button>
-                </>
-              )}
-            </div>
-            
-            {project.images.length > 1 && (
-              <div className="thumbnail-gallery">
-                {project.images.map((image, index) => (
-                  <button
-                    key={index}
-                    className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
-                    onClick={() => setCurrentImageIndex(index)}
-                    aria-label={`Ver imagen ${index + 1}`}
-                  >
-                    <img src={image} alt={`Miniatura ${index + 1}`} loading="lazy" />
-                  </button>
-                ))}
+            <div className="gallery-header" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+              <div className="view-toggle">
+                <button 
+                  className={`view-btn ${viewMode === 'images' ? 'active' : ''}`}
+                  onClick={() => setViewMode('images')}
+                >
+                  Imágenes
+                </button>
+                <button 
+                  className={`view-btn ${viewMode === 'tour' ? 'active' : ''}`}
+                  onClick={() => setViewMode('tour')}
+                >
+                  Tour 360°
+                </button>
               </div>
+            </div>
+
+            {viewMode === 'images' ? (
+              <>
+                <div className="main-image">
+                  <img 
+                    src={project.images[currentImageIndex]} 
+                    alt={`${project.title} - Imagen ${currentImageIndex + 1}`}
+                    loading="lazy"
+                  />
+                  {project.images.length > 1 && (
+                    <>
+                      <button 
+                        className="gallery-nav prev"
+                        onClick={prevImage}
+                        aria-label="Imagen anterior"
+                      >
+                        <ChevronLeft size={24} />
+                      </button>
+                      <button 
+                        className="gallery-nav next"
+                        onClick={nextImage}
+                        aria-label="Imagen siguiente"
+                      >
+                        <ChevronRight size={24} />
+                      </button>
+                    </>
+                  )}
+                </div>
+                {project.images.length > 1 && (
+                  <div className="thumbnail-gallery">
+                    {project.images.map((image, index) => (
+                      <button
+                        key={index}
+                        className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
+                        onClick={() => setCurrentImageIndex(index)}
+                        aria-label={`Ver imagen ${index + 1}`}
+                      >
+                        <img src={image} alt={`Miniatura ${index + 1}`} loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <KuulaTour 
+                id={project.id}
+                title={project.title}
+                description={project.location}
+                src={project.kuulaSrc || SAMPLE_COLLECTION_SRC}
+              />
             )}
           </div>
         </div>

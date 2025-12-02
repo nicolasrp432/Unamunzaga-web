@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BlogPost } from '../../types';
 import { Calendar, Clock, Tag, ArrowRight, Search } from 'lucide-react';
@@ -11,19 +11,25 @@ interface BlogSectionProps {
 export const BlogSection: React.FC<BlogSectionProps> = ({ posts }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [hoveredPost, setHoveredPost] = useState<string | null>(null);
 
-  const categories = ['Todos', ...Array.from(new Set(posts.map(post => post.category)))];
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  const categories = useMemo(() => ['Todos', ...Array.from(new Set(posts.map(post => post.category)))], [posts]);
   
-  const filteredPosts = posts.filter(post => {
+  const filteredPosts = useMemo(() => posts.filter(post => {
+    const q = debouncedSearch.toLowerCase();
     const matchesCategory = selectedCategory === 'Todos' || post.category === selectedCategory;
-    const matchesSearch = searchQuery === '' || 
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+    const matchesSearch = debouncedSearch === '' || 
+      post.title.toLowerCase().includes(q) ||
+      post.excerpt.toLowerCase().includes(q) ||
+      post.tags.some(tag => tag.toLowerCase().includes(q));
     return matchesCategory && matchesSearch && post.published;
-  });
+  }), [posts, selectedCategory, debouncedSearch]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -74,6 +80,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ posts }) => {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar artículos..."
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+              aria-label="Buscar artículos"
             />
           </div>
         </motion.div>

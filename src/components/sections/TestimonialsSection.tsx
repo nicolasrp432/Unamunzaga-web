@@ -190,13 +190,17 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
           {/* Navigation Buttons */}
           <button
             onClick={prevTestimonial}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-20"
+            aria-label="Anterior"
+            type="button"
           >
             <ChevronLeft className="w-6 h-6 text-gray-700" />
           </button>
           <button
             onClick={nextTestimonial}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-20"
+            aria-label="Siguiente"
+            type="button"
           >
             <ChevronRight className="w-6 h-6 text-gray-700" />
           </button>

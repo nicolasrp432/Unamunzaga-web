@@ -16,7 +16,8 @@
     "services": ["Cocina", "Baño", "Electricidad", "Fontanería", "Pintura"],
     "testimonial": "Excelente trabajo de Unamunzaga. Quedamos muy satisfechos con la reforma integral de nuestra vivienda. Profesionales y puntuales.",
     "client_name": "María García",
-    "featured": true
+    "featured": true,
+    "kuulaSrc": "https://kuula.co/share/collection/1fR8Q?fs=1&vr=0&zoom=1&sd=1&initload=1&thumbs=1"
   },
   {
     "id": 2,
@@ -35,7 +36,8 @@
     "services": ["Instalaciones", "Fontanería", "Electricidad", "Acústica", "Decoración"],
     "testimonial": "Transformaron completamente nuestro local. Ahora tenemos un restaurante moderno y funcional que atrae a muchos clientes.",
     "client_name": "Carlos Mendieta",
-    "featured": true
+    "featured": true,
+    "kuulaSrc": "https://kuula.co/share/collection/1fR8R?fs=1&vr=0&zoom=1&sd=1&initload=1&thumbs=1"
   },
   {
     "id": 3,
@@ -89,7 +91,8 @@
     "services": ["Oficina", "Electricidad", "Redes", "Climatización", "Mobiliario"],
     "testimonial": "Nuestras nuevas oficinas son funcionales y modernas. Ha mejorado mucho el ambiente de trabajo.",
     "client_name": "Tech Solutions S.L.",
-    "featured": true
+    "featured": true,
+    "kuulaSrc": "https://kuula.co/share/collection/1fR8S?fs=1&vr=0&zoom=1&sd=1&initload=1&thumbs=1"
   },
   {
     "id": 6,

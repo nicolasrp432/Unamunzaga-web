@@ -1,133 +1,168 @@
+/* Home Page Dark Theme Styles */
+.home-page {
+    --bg-dark: #0f172a; /* Slate 900 */
+    --bg-card: #1e293b; /* Slate 800 */
+    --bg-card-hover: #334155; /* Slate 700 */
+    --text-main: #f8fafc; /* Slate 50 */
+    --text-muted: #94a3b8; /* Slate 400 */
+    --accent: #f97316; /* Orange 500 */
+    --accent-hover: #ea580c; /* Orange 600 */
+    --border-color: #334155; /* Slate 700 */
 
-.home .section {
-    padding: 6rem 0;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
 }
 
-.text-lg {
-    font-size: 1.125rem;
+/* Navbar Overrides */
+.home-page nav {
+    background-color: rgba(15, 23, 42, 0.95) !important;
+    border-bottom: 1px solid var(--border-color) !important;
 }
 
-.text-text-light {
-    color: var(--color-text-light);
+.home-page nav a, 
+.home-page nav button:not(.bg-amber-500) {
+    color: var(--text-muted) !important;
 }
 
-.max-w-2xl {
-    max-width: 42rem;
+.home-page nav a:hover, 
+.home-page nav button:not(.bg-amber-500):hover {
+    color: var(--accent) !important;
 }
 
-.mx-auto {
-    margin-left: auto;
-    margin-right: auto;
+/* Button Overrides */
+.home-page .bg-amber-500,
+.home-page .bg-amber-400 {
+    background-color: var(--accent) !important;
+    color: white !important;
 }
 
-.mt-8 {
-    margin-top: 2rem;
+.home-page .bg-amber-500:hover,
+.home-page .bg-amber-400:hover {
+    background-color: var(--accent-hover) !important;
 }
 
-.hero-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
+.home-page .text-amber-500,
+.home-page .text-amber-400 {
+    color: var(--accent) !important;
 }
 
-.btn-outline-white {
-    border: 2px solid white;
-    color: white;
-    background-color: transparent;
+/* Section Overrides */
+.home-page section {
+    background-color: transparent !important;
 }
 
-.btn-outline-white:hover {
-    background: white;
-    color: var(--color-secondary);
+.home-page #portfolio,
+.home-page #testimonials,
+.home-page #blog,
+.home-page .services-preview,
+.home-page .bg-gray-50 {
+    background-color: var(--bg-dark) !important;
 }
 
-/* Services Preview */
-.services-preview {
-    background-color: var(--color-bg-light);
+/* CTA Section specific override */
+.home-page section.bg-blue-900 {
+    background-color: var(--bg-card) !important;
+    border-top: 1px solid var(--border-color);
 }
 
-.services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
+/* Typography Overrides */
+.home-page h1, 
+.home-page h2, 
+.home-page h3, 
+.home-page h4, 
+.home-page h5, 
+.home-page h6 {
+    color: var(--text-main) !important;
 }
 
-.service-card {
-    background: var(--color-secondary);
-    padding: 2.5rem;
-    border-radius: 8px;
-    border: 1px solid #4A5568;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.home-page p, 
+.home-page span, 
+.home-page li {
+    color: var(--text-muted);
 }
 
-.service-card:hover {
+.home-page .text-gray-600,
+.home-page .text-gray-700,
+.home-page .text-gray-500,
+.home-page .text-gray-800,
+.home-page .text-gray-900 {
+    color: var(--text-muted) !important;
+}
+
+.home-page h2.text-gray-900,
+.home-page h3.text-gray-900 {
+    color: var(--text-main) !important;
+}
+
+/* Card Overrides (Portfolio, Services, etc) */
+.home-page .bg-white {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+.home-page .bg-white:hover {
+    background-color: var(--bg-card-hover) !important;
+    border-color: var(--accent);
+}
+
+/* Service Cards specifically if they use classes from Home.css */
+.home-page .service-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.home-page .service-card:hover {
+    border-color: var(--accent);
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-.icon-box {
-    background: var(--color-primary);
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    margin-bottom: 1.5rem;
+.home-page .icon-box {
+    background-color: rgba(249, 115, 22, 0.1);
+    color: var(--accent);
 }
 
-.service-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--color-text);
+/* Footer Override */
+.home-page footer {
+    background-color: #020617 !important; /* Darker than bg-dark */
+    border-top: 1px solid var(--border-color);
 }
 
-.service-card p {
-    color: var(--color-text-light);
-    margin-bottom: 1.5rem;
+.home-page footer h3 {
+    color: var(--text-main) !important;
 }
 
-/* About Preview */
-.about-preview {
-    background-color: var(--color-secondary);
+.home-page footer a {
+    color: var(--text-muted) !important;
 }
 
-.about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
+.home-page footer a:hover {
+    color: var(--accent) !important;
 }
 
-.about-image img {
-    border-radius: 8px;
+/* Specific fixes for elements that might need it */
+.home-page input, 
+.home-page textarea {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
 }
 
-.section-title {
-    color: var(--color-text);
+.home-page input:focus, 
+.home-page textarea:focus {
+    border-color: var(--accent) !important;
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent);
 }
 
-.section-subtitle {
-    color: var(--color-text-light);
+/* Hero Section adjustments */
+.home-page .hero-section h1 {
+    color: white !important; /* Ensure hero text stays white on image */
 }
 
-.features-list li {
-    color: var(--color-text);
-}
-
-/* CTA Section */
-.cta-section {
-    background-color: var(--color-bg-light);
-}
-
-.cta-section h2 {
-    color: white;
-}
-
-@media (max-width: 768px) {
-    .about-grid {
-        grid-template-columns: 1fr;
-    }
+/* Stats/KPIs */
+.home-page .hero-section .bg-white\/10 {
+    background-color: rgba(30, 41, 59, 0.8) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
 }

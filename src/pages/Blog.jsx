@@ -1,6 +1,6 @@
 import { ModernNavbar } from '../components/layout/ModernNavbar';
 import ModernFooter from '../components/layout/ModernFooter';
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Calendar, 
@@ -13,71 +13,84 @@ import {
   TrendingUp,
   Filter
 } from 'lucide-react';
-import blogData from '../data/blog.json';
 import './Blog.css';
 
 const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTag, setSelectedTag] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Get unique categories and tags
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://news.google.com/rss/search?q=reformas%20OR%20construcción&hl=es&gl=ES&ceid=ES:es');
+    setLoading(true);
+    setError(null);
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const items = Array.isArray(data.items) ? data.items : [];
+        setPosts(items);
+      })
+      .catch(e => setError('No se pudo cargar el contenido de actualidad'))
+      .finally(() => setLoading(false));
+  }, []);
+
   const categories = useMemo(() => {
     const cats = new Set();
-    blogData.forEach(post => cats.add(post.category));
+    posts.forEach(p => {
+      if (Array.isArray(p.categories)) p.categories.forEach(c => cats.add(c));
+    });
     return ['all', ...Array.from(cats)];
-  }, []);
+  }, [posts]);
 
   const allTags = useMemo(() => {
     const tags = new Set();
-    blogData.forEach(post => {
-      post.tags.forEach(tag => tags.add(tag));
+    posts.forEach(p => {
+      if (Array.isArray(p.categories)) p.categories.forEach(t => tags.add(t));
     });
     return ['all', ...Array.from(tags)];
-  }, []);
+  }, [posts]);
 
   const filteredPosts = useMemo(() => {
-    let filtered = blogData;
-
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(post => 
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.author.toLowerCase().includes(searchTerm.toLowerCase())
+    let filtered = [...posts];
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
+      filtered = filtered.filter(post =>
+        (post.title || '').toLowerCase().includes(q) ||
+        (post.description || '').toLowerCase().includes(q) ||
+        (post.content || '').toLowerCase().includes(q) ||
+        (post.author || '').toLowerCase().includes(q)
       );
     }
-
-    // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(post => post.category === selectedCategory);
+      filtered = filtered.filter(post => Array.isArray(post.categories) && post.categories.includes(selectedCategory));
     }
-
-    // Filter by tag
     if (selectedTag !== 'all') {
-      filtered = filtered.filter(post => post.tags.includes(selectedTag));
+      filtered = filtered.filter(post => Array.isArray(post.categories) && post.categories.includes(selectedTag));
     }
-
-    // Sort posts
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return new Date(b.date) - new Date(a.date);
+          return new Date(b.pubDate) - new Date(a.pubDate);
         case 'oldest':
-          return new Date(a.date) - new Date(b.date);
-        case 'popular':
-          return b.views - a.views;
+          return new Date(a.pubDate) - new Date(b.pubDate);
         case 'title':
-          return a.title.localeCompare(b.title);
+          return (a.title || '').localeCompare(b.title || '');
         default:
           return 0;
       }
     });
-
     return filtered;
-  }, [searchTerm, selectedCategory, selectedTag, sortBy]);
+  }, [posts, debouncedSearch, selectedCategory, selectedTag, sortBy]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -95,27 +108,10 @@ const Blog = () => {
     return readingTime;
   };
 
-  const getCategoryName = (category) => {
-    const names = {
-      'consejos': 'Consejos y Trucos',
-      'tendencias': 'Tendencias',
-      'reformas': 'Reformas',
-      'diseno': 'Diseño de Interiores',
-      'mantenimiento': 'Mantenimiento'
-    };
-    return names[category] || category;
-  };
+  const getCategoryName = (category) => category;
+  const getCategoryColor = () => '#6b7280';
 
-  const getCategoryColor = (category) => {
-    const colors = {
-      'consejos': '#10b981',
-      'tendencias': '#f59e0b',
-      'reformas': '#3b82f6',
-      'diseno': '#8b5cf6',
-      'mantenimiento': '#ef4444'
-    };
-    return colors[category] || '#6b7280';
-  };
+  const readingMinutes = (post) => getReadingTime((post.content || post.description || '')); 
 
   return (
     <>
@@ -149,6 +145,7 @@ const Blog = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="search-input"
+                  aria-label="Buscar artículos"
                 />
               </div>
             </div>
@@ -250,18 +247,22 @@ const Blog = () => {
       {/* Blog Posts Grid */}
       <section className="blog-posts">
         <div className="container">
-          {filteredPosts.length > 0 ? (
+          {loading ? (
+            <div className="no-results"><h3>Cargando contenido...</h3></div>
+          ) : error ? (
+            <div className="no-results"><h3>{error}</h3></div>
+          ) : filteredPosts.length > 0 ? (
             <div className="posts-grid">
               {filteredPosts.map((post) => (
-                <article key={post.slug} className="post-card">
+                <article key={post.guid || post.link} className="post-card">
                   <div className="post-image">
                     <img 
-                      src={post.featured_image} 
+                      src={post.thumbnail || '/placeholder.jpg'} 
                       alt={post.title}
                       loading="lazy"
                     />
-                    <div className="post-category" style={{ backgroundColor: getCategoryColor(post.category) }}>
-                      {getCategoryName(post.category)}
+                    <div className="post-category" style={{ backgroundColor: getCategoryColor() }}>
+                      {Array.isArray(post.categories) && post.categories[0] ? getCategoryName(post.categories[0]) : 'Actualidad'}
                     </div>
                   </div>
                   
@@ -269,36 +270,36 @@ const Blog = () => {
                     <div className="post-meta">
                       <div className="meta-item">
                         <Calendar size={14} />
-                        <span>{formatDate(post.date)}</span>
+                        <span>{formatDate(post.pubDate)}</span>
                       </div>
                       <div className="meta-item">
                         <Clock size={14} />
-                        <span>{getReadingTime(post.content)} min lectura</span>
+                        <span>{readingMinutes(post)} min lectura</span>
                       </div>
                       <div className="meta-item">
                         <User size={14} />
-                        <span>{post.author}</span>
+                        <span>{post.author || new URL(post.link).hostname}</span>
                       </div>
                     </div>
                     
                     <h2 className="post-title">
-                      <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+                      <a href={post.link} target="_blank" rel="noopener noreferrer">{post.title}</a>
                     </h2>
                     
-                    <p className="post-excerpt">{post.excerpt}</p>
+                    <p className="post-excerpt">{post.description}</p>
                     
                     <div className="post-tags">
-                      {post.tags.slice(0, 3).map((tag, index) => (
+                      {(Array.isArray(post.categories) ? post.categories : []).slice(0, 3).map((tag, index) => (
                         <span key={index} className="tag-item">
                           {tag}
                         </span>
                       ))}
                     </div>
                     
-                    <Link to={`/blog/${post.slug}`} className="read-more">
+                    <a href={post.link} target="_blank" rel="noopener noreferrer" className="read-more">
                       Leer más
                       <ArrowRight size={16} />
-                    </Link>
+                    </a>
                   </div>
                 </article>
               ))}

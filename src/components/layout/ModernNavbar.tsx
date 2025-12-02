@@ -22,7 +22,8 @@ const navigationItems = [
   { label: 'Servicios', href: '/servicios', icon: Briefcase },
   { label: 'Proyectos', href: '/proyectos', icon: Users },
   { label: 'Nosotros', href: '/nosotros', icon: BookOpen },
-  { label: 'Bolsa de Empleo', href: '/bolsa-empleo', icon: UserPlus }
+  { label: 'Bolsa de Empleo', href: '/bolsa-empleo', icon: UserPlus },
+  { label: 'Contacto', href: '/contacto', icon: Phone }
 ];
 
 export const ModernNavbar: React.FC = () => {

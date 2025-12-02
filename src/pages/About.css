@@ -657,25 +657,36 @@
   animation-play-state: paused;
 }
 
+.logos-rows {
+  display: grid;
+  grid-template-rows: repeat(2, auto);
+  gap: 1.5rem;
+}
+
+.logos-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem 3rem;
+}
+
 .logo-item img {
   display: block;
   max-height: 120px;
   width: auto;
-  filter: grayscale(100%);
-  opacity: 0.85;
+  opacity: 1;
   transition: transform 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
 }
 
 .logo-item:hover img {
-  filter: grayscale(0%);
   opacity: 1;
   transform: scale(1.06);
 }
 
 @keyframes marquee-slide {
   0% { transform: translateX(0); }
-  95% { transform: translateX(-100%); }
-  100% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 @media (max-width: 768px) {
@@ -683,12 +694,12 @@
     font-size: 1.75rem;
   }
   .logo-item img {
-    max-height: 90px;
+    max-height: 96px;
   }
 }
 
 @media (max-width: 480px) {
   .logo-item img {
-    max-height: 72px;
+    max-height: 80px;
   }
 }

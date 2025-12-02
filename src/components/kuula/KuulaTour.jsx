@@ -1,7 +1,11 @@
 import { useState } from 'react';
 
+export const DEFAULT_KUULA_SRC = 'https://kuula.co/share/h5Hpv?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1';
+export const SAMPLE_COLLECTION_SRC = 'https://kuula.co/share/collection/7Hf29?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1';
+
 const KuulaTour = ({ id, title, description, src, fullScreen = false, children }) => {
     const [loading, setLoading] = useState(true);
+    const finalSrc = src || DEFAULT_KUULA_SRC;
 
     if (fullScreen) {
         return (
@@ -22,7 +26,7 @@ const KuulaTour = ({ id, title, description, src, fullScreen = false, children }
                     allow="xr-spatial-tracking; gyroscope; accelerometer"
                     allowFullScreen
                     scrolling="no"
-                    src={`${src}&chromeless=1`}
+                    src={`${finalSrc}&chromeless=1`}
                     onLoad={() => setLoading(false)}
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', zIndex: 1 }}
                 />
@@ -60,14 +64,14 @@ const KuulaTour = ({ id, title, description, src, fullScreen = false, children }
                         allow="xr-spatial-tracking; gyroscope; accelerometer"
                         allowFullScreen
                         scrolling="no"
-                        src={src}
+                        src={finalSrc}
                         onLoad={() => setLoading(false)}
                         style={{ position: 'absolute', inset: 0, border: 'none' }}
                     />
                 </div>
             </div>
             <div style={{ marginTop: '0.75rem' }}>
-                <a href={src} target="_blank" rel="noopener noreferrer" className="btn btn-outline">Explora el proyecto en 360°</a>
+                <a href={finalSrc} target="_blank" rel="noopener noreferrer" className="btn btn-outline">Explora el proyecto en 360°</a>
             </div>
             <style>
                 {`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}

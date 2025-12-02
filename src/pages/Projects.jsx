@@ -249,12 +249,16 @@ const Projects = () => {
                     </div>
                   )}
 
-                  <div className="project-actions">
-                    <Link to={`/proyectos/${project.id}`} className="btn btn-primary">
-                      Ver Detalles
-                      <ArrowRight size={16} />
-                    </Link>
-                  </div>
+                <div className="project-actions">
+                  <Link to={`/proyectos/${project.id}`} className="btn btn-primary">
+                    Ver Detalles
+                    <ArrowRight size={16} />
+                  </Link>
+                  <Link to={`/proyectos/${project.id}#tour`} className="btn btn-outline" style={{ marginLeft: '0.5rem' }}>
+                    <Eye size={16} />
+                    Tour 360°
+                  </Link>
+                </div>
                 </div>
               </div>
             ))}
