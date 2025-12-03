@@ -7,10 +7,10 @@ import {
   Shield, 
   Send, 
   CheckCircle,
-  MessageCircle,
   Phone,
   Mail 
 } from 'lucide-react';
+import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { cn } from '../../lib/utils';
 
 interface FormData {
@@ -56,6 +56,7 @@ export const CTASection: React.FC = () => {
       }, 5000);
       
     } catch (error) {
+      console.error(error);
       setSubmitStatus('error');
       setTimeout(() => {
         setSubmitStatus('idle');
@@ -163,7 +164,7 @@ export const CTASection: React.FC = () => {
                 onClick={openWhatsApp}
                 className="flex items-center justify-center space-x-2 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
-                <MessageCircle className="w-5 h-5" />
+                <IconBrandWhatsapp size={20} />
                 <span>WhatsApp</span>
               </motion.button>
 

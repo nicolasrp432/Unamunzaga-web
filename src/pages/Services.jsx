@@ -60,7 +60,6 @@ const Services = () => {
   const clientLogos = [
     logo,
     '/creen/imgi_10_estudios-9.png',
-    '/creen/imgi_11_estudios-8 (1).png',
     '/creen/imgi_11_estudios-8.png',
     '/creen/imgi_12_estudios-7.png',
     '/creen/imgi_13_estudios-6.png',
@@ -155,20 +154,7 @@ const Services = () => {
 
       <ClientTrust images={clientLogos} />
 
-      {/* Prueba social: logos/testimonios mini */}
-      <div className="max-w-7xl mx-auto px-4 pb-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
-          {[1,2,3,4].map((i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} className="flex justify-center">
-              <img
-                src={logo}
-                alt={`Logo cliente ${i}`}
-                className="h-12 object-contain grayscale hover:grayscale-0 transition"
-              />
-            </motion.div>
-          ))}
-        </div>
-      </div>
+
 
       {/* Bloque asistente visual */}
       <div className="bg-gray-50">
@@ -178,8 +164,8 @@ const Services = () => {
             <p className="text-gray-600">Elige tu perfil y te mostramos ejemplos y soluciones.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="px-6 py-3 rounded-xl bg-blue-900 text-white hover:bg-blue-800">Soy particular</button>
-            <button className="px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300">Soy arquitecto / profesional</button>
+            <a href="#contacto" className="px-6 py-3 rounded-xl bg-blue-900 text-white hover:bg-blue-800">Soy particular</a>
+            <a href="#contacto" className="px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300">Soy arquitecto / profesional</a>
           </div>
         </div>
       </div>
@@ -213,11 +199,11 @@ const Services = () => {
         <div className="container">
           <div className="section-header text-center">
             <h2 className="section-title">Rediseña tu espacio con IA</h2>
-            <p className="section-subtitle">Edita tu espacio con IA en segundos usando DekorAI, ¡prueba el rediseño interactivo!</p>
+            <p className="section-subtitle">Explora y diseña con la aplicación AI Space Canvas integrada en nuestra web.</p>
           </div>
           <DekorAIEmbed
-            src="https://dekorai.com/prueba-dekorai-gratis-en-tu-e-commerce-por-un-mes/#style-swapper"
-            title="DekorAI IA Editor"
+            src="https://ai-space-canvas.lovable.app"
+            title="AI Space Canvas"
             height={800}
             allow="camera; microphone; fullscreen"
           />

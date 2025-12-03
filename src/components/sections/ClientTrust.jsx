@@ -4,7 +4,6 @@ const ClientTrust = ({
   title = 'Ellos creen en nosotros',
   images = [
     '/creen/imgi_10_estudios-9.png',
-    '/creen/imgi_11_estudios-8 (1).png',
     '/creen/imgi_11_estudios-8.png',
     '/creen/imgi_12_estudios-7.png',
     '/creen/imgi_13_estudios-6.png',

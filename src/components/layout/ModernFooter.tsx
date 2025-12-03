@@ -4,9 +4,6 @@ import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Linkedin } from 'lucid
 import FloatingWhatsApp from '../ui/FloatingWhatsApp';
 
 const ModernFooter: React.FC = () => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   const contactInfo = [
     {

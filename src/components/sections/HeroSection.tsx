@@ -96,7 +96,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
         </AnimatePresence>
         
         {/* Carousel Controls */}
-        <div className="absolute inset-0 z-50 flex items-center justify-between px-4 pointer-events-none">
+        <div className="absolute inset-0 z-50 hidden md:flex items-center justify-between px-4 pointer-events-none">
           <button 
             onClick={prevImage}
             className="p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white transition-all pointer-events-auto transform hover:scale-110"

@@ -17,12 +17,17 @@ const NewsletterSignup = () => {
   };
 
   return (
-    <section className="newsletter-section">
+    <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="newsletter-content">
-          <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>Suscríbete a nuestra newsletter</h2>
-          <p style={{ opacity: 0.9 }}>Recibe consejos de reformas y novedades directamente en tu correo</p>
-          <form className="newsletter-form" onSubmit={handleSubmit}>
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="bg-amber-100 text-amber-600 rounded-full p-2">
+              <Mail className="w-6 h-6" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Suscríbete a nuestra newsletter</h2>
+          </div>
+          <p className="text-gray-700 mb-6">Recibe consejos de reformas y novedades directamente en tu correo</p>
+          <form className="flex flex-col sm:flex-row gap-3" onSubmit={handleSubmit}>
             <input
               type="email"
               placeholder="tu@email.com"
@@ -31,13 +36,32 @@ const NewsletterSignup = () => {
               aria-label="Correo electrónico"
               inputMode="email"
               autoComplete="email"
+              className="flex-1 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button type="submit" disabled={status === 'loading'}>
-              {status === 'loading' ? 'Enviando…' : 'Suscribirme'}
+            <button
+              type="submit"
+              disabled={status === 'loading'}
+              className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white shadow-md transition-colors duration-200 ${
+                status === 'loading'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-amber-500 hover:bg-amber-600'
+              }`}
+            >
+              {status === 'loading' ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Enviando…</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-5 h-5" />
+                  <span>Suscribirme</span>
+                </>
+              )}
             </button>
           </form>
           {status === 'success' && (
-            <p style={{ marginTop: 12 }}>¡Gracias! Te hemos suscrito correctamente.</p>
+            <p className="mt-4 text-green-700">¡Gracias! Te hemos suscrito correctamente.</p>
           )}
         </div>
       </div>

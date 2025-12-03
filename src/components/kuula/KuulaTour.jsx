@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export const DEFAULT_KUULA_SRC = 'https://kuula.co/share/h5Hpv?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1';
+export const DEFAULT_KUULA_SRC = 'https://kuula.co/share/collection/7Hf29?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1';
 export const SAMPLE_COLLECTION_SRC = 'https://kuula.co/share/collection/7Hf29?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1';
 
 const KuulaTour = ({ id, title, description, src, fullScreen = false, children }) => {
@@ -46,7 +46,7 @@ const KuulaTour = ({ id, title, description, src, fullScreen = false, children }
         <section id={`tour-${id}`} className="kuula-tour" style={{ marginBottom: '3rem' }}>
             <h3 style={{ marginBottom: '0.5rem' }}>{title}</h3>
             {description && <p style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>{description}</p>}
-            <div style={{ position: 'relative', width: '100%', borderRadius: '8px', overflow: 'hidden', background: '#111' }}>
+            <div style={{ position: 'relative', width: '100%', height: 640, borderRadius: '8px', overflow: 'hidden', background: '#111' }}>
                 {loading && (
                     <div style={{
                         position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -55,20 +55,18 @@ const KuulaTour = ({ id, title, description, src, fullScreen = false, children }
                         <div style={{ width: 48, height: 48, borderRadius: '50%', border: '4px solid #fff', borderTopColor: 'var(--color-accent)', animation: 'spin 1s linear infinite' }} />
                     </div>
                 )}
-                <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
-                    <iframe
-                        title={title}
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        allow="xr-spatial-tracking; gyroscope; accelerometer"
-                        allowFullScreen
-                        scrolling="no"
-                        src={finalSrc}
-                        onLoad={() => setLoading(false)}
-                        style={{ position: 'absolute', inset: 0, border: 'none' }}
-                    />
-                </div>
+                <iframe
+                    title={title}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    allow="xr-spatial-tracking; gyroscope; accelerometer"
+                    allowFullScreen
+                    scrolling="no"
+                    src={finalSrc}
+                    onLoad={() => setLoading(false)}
+                    style={{ position: 'absolute', inset: 0, border: 'none' }}
+                />
             </div>
             <div style={{ marginTop: '0.75rem' }}>
                 <a href={finalSrc} target="_blank" rel="noopener noreferrer" className="btn btn-outline">Explora el proyecto en 360°</a>

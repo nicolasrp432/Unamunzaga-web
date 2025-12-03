@@ -5,8 +5,8 @@
     --bg-card-hover: #334155; /* Slate 700 */
     --text-main: #f8fafc; /* Slate 50 */
     --text-muted: #94a3b8; /* Slate 400 */
-    --accent: #f97316; /* Orange 500 */
-    --accent-hover: #ea580c; /* Orange 600 */
+    --accent: rgb(213, 66, 25);
+    --accent-hover: rgb(178, 58, 20);
     --border-color: #334155; /* Slate 700 */
 
     background-color: var(--bg-dark);

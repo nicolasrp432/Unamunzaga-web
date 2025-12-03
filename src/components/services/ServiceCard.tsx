@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { Check, MessageCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Check, MessageCircle, Sparkles } from 'lucide-react';
 import type { ServiceItem } from '../../data/services';
 
 type Props = {

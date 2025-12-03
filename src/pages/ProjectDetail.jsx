@@ -221,7 +221,6 @@ const ProjectDetail = () => {
                 id={project.id}
                 title={project.title}
                 description={project.location}
-                src={project.kuulaSrc || SAMPLE_COLLECTION_SRC}
               />
             )}
           </div>
