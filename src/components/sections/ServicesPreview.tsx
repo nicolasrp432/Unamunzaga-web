@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { servicesData } from '../../data/services';
 import ServiceCard from '../services/ServiceCard';
 
@@ -19,6 +20,7 @@ const quickFilters = [
 
 export const ServicesPreview: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>('principales');
+  const navigate = useNavigate();
 
   const filtered = useMemo(() => {
     if (selectedFilter === 'principales') {
@@ -33,7 +35,7 @@ export const ServicesPreview: React.FC = () => {
   }, [selectedFilter]);
 
   return (
-    <section id="services" className="services-preview py-20 bg-blue-700">
+    <section id="services" className="services-preview py-20 bg-blue-900">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-10 flex items-start justify-between">
           <div>
@@ -59,7 +61,13 @@ export const ServicesPreview: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map((service) => (
-            <ServiceCard key={service.id} service={service} compact />
+            <ServiceCard
+              key={service.id}
+              service={service}
+              compact
+              showCTAs
+              onQuote={() => navigate('/contacto')}
+            />
           ))}
         </div>
       </div>

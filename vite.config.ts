@@ -68,13 +68,49 @@ export default defineConfig({
                 messages,
               }),
             })
-            const data = await upstream.json()
+            const status = upstream.status
+            const text = await upstream.text()
+            res.statusCode = status
             res.setHeader('Content-Type', 'application/json')
-            res.end(JSON.stringify(data))
+            res.end(text)
           } catch {
             res.statusCode = 500
             res.setHeader('Content-Type', 'application/json')
             res.end(JSON.stringify({ error: 'proxy_error' }))
+          }
+        })
+        server.middlewares.use('/api/mistral-ping', async (_req, res) => {
+          const apiKey = process.env.MISTRAL_API_KEY
+          if (!apiKey) {
+            res.statusCode = 500
+            res.end(JSON.stringify({ ok: false, error: 'Missing MISTRAL_API_KEY' }))
+            return
+          }
+          try {
+            const upstream = await fetch('https://api.mistral.ai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+              },
+              body: JSON.stringify({
+                model: 'mistral-small-latest',
+                messages: [
+                  { role: 'system', content: 'Dev ping' },
+                  { role: 'user', content: 'ping' },
+                ],
+                max_tokens: 16,
+              }),
+            })
+            const status = upstream.status
+            const text = await upstream.text()
+            res.statusCode = status
+            res.setHeader('Content-Type', 'application/json')
+            res.end(text)
+          } catch {
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ ok: false, error: 'proxy_error' }))
           }
         })
       },

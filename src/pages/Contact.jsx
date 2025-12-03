@@ -67,8 +67,10 @@ const Contact = () => {
                         <div className="info-item">
                             <div className="icon-box-sm"><Phone size={20} /></div>
                             <div>
-                                <h3>Teléfono</h3>
-                                <p>+34 944 000 000</p>
+                                <h3>Teléfonos</h3>
+                                <p>+34 944 07 84 27</p>
+                                <p>+34 674 27 44 66</p>
+                                <p>+34 629 11 65 15</p>
                             </div>
                         </div>
 
@@ -76,7 +78,7 @@ const Contact = () => {
                             <div className="icon-box-sm"><Mail size={20} /></div>
                             <div>
                                 <h3>Email</h3>
-                                <p>info@unamunzagaobras.com</p>
+                                <p>contacto@unamunzagaobras.com</p>
                             </div>
                         </div>
 

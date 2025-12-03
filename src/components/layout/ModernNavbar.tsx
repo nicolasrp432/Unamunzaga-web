@@ -16,6 +16,7 @@ import {
 import { cn } from '../../lib/utils';
 import { useScrollEffects } from '../../hooks/useScrollEffects';
 import logo from '../../assets/logo.png';
+import GlobalSearch from '../search/GlobalSearch';
 
 const navigationItems = [
   { label: 'Inicio', href: '/', icon: Home },
@@ -32,7 +33,6 @@ export const ModernNavbar: React.FC = () => {
   const { scrollY } = useScrollEffects();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     // Keep scroll effects hook active for potential future UI changes
@@ -50,12 +50,7 @@ export const ModernNavbar: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement search functionality
-    console.log('Searching for:', searchQuery);
-    setIsSearchOpen(false);
-  };
+  
 
   return (
     <>
@@ -133,14 +128,14 @@ export const ModernNavbar: React.FC = () => {
                   'text-gray-700 hover:text-blue-900 hover:bg-blue-50' 
                 )}
               >
-                <Search className="w-5 h-5" />
+              <Search className="w-5 h-5" />
               </motion.button>
 
               {/* CTA Button */}
               <motion.button
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => scrollToSection('contact')}
+                onClick={() => scrollToSection('/contacto')}
                 className={cn(
                   'hidden lg:flex items-center space-x-2 px-6 py-2 rounded-lg font-medium transition-all duration-300',
                   'bg-amber-500 text-white hover:bg-amber-600 shadow-lg hover:shadow-xl'
@@ -205,7 +200,7 @@ export const ModernNavbar: React.FC = () => {
                 
                 <motion.button
                   whileHover={{ x: 8 }}
-                  onClick={() => scrollToSection('contact')}
+                  onClick={() => scrollToSection('/contacto')}
                   className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left bg-amber-500 text-white hover:bg-amber-600 transition-all duration-300"
                 >
                   <Calculator className="w-5 h-5" />
@@ -217,52 +212,7 @@ export const ModernNavbar: React.FC = () => {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Search Modal */}
-      <AnimatePresence>
-        {isSearchOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsSearchOpen(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: -50 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: -50 }}
-              className="absolute top-20 left-1/2 transform -translate-x-1/2 w-full max-w-2xl px-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                <div className="flex items-center px-6 py-4">
-                  <Search className="w-5 h-5 text-gray-400 mr-3" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Busca proyectos, servicios o consejos..."
-                    className="flex-1 outline-none text-lg placeholder-gray-400"
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setIsSearchOpen(false)}
-                    className="ml-3 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                  <p className="text-sm text-gray-600">
-                    Presiona Enter para buscar o ESC para cerrar
-                  </p>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 };

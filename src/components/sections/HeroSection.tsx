@@ -3,6 +3,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
 import CountUp from 'react-countup';
 import { Play, Calculator, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { KPI } from '../../types';
 
 interface HeroSectionProps {
@@ -45,6 +46,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
   const [currentImage, setCurrentImage] = useState(0);
   const [currentTitle, setCurrentTitle] = useState(0);
   const [currentMobileMsg, setCurrentMobileMsg] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -81,7 +83,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
     <section id="home" className="relative min-h-[70vh] md:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Carousel */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-blue-800/70 to-amber-600/60 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-black-800/70 to-amber-600/60 z-10" />
         <AnimatePresence mode="wait">
           <motion.img
             key={currentImage}
@@ -168,7 +170,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.4 }}
-              className="md:hidden text-base font-bold tracking-wide text-amber-300 max-w-xs mx-auto leading-relaxed"
+              className="md:hidden text-base font-bold tracking-wide text-amber-400 max-w-xs mx-auto leading-relaxed"
             >
               {mobileMessages[currentMobileMsg]}
             </motion.p>
@@ -253,7 +255,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
             <motion.button
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => navigate('/contacto')}
               className="px-8 py-4 bg-amber-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
             >
               <span>Solicita Presupuesto</span>
@@ -267,6 +269,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
               className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center space-x-2"
             >
               <span>Ver Proyectos</span>
+              <Play className="w-5 h-5" />
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/servicios#editor-ia')}
+              className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center space-x-2"
+            >
+              <span>Rediseña tu espacio</span>
               <Play className="w-5 h-5" />
             </motion.button>
           </motion.div>

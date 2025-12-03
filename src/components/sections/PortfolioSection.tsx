@@ -10,6 +10,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import KuulaTour from '../kuula/KuulaTour';
 
 export type ProjectData = {
   id: number;
@@ -289,6 +290,17 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Descripción</h3>
                   <p className="text-gray-600 leading-relaxed">{selectedProject.description}</p>
                 </div>
+
+                {selectedProject.kuulaSrc && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Visualiza en 360°</h3>
+                    <KuulaTour
+                      id={String(selectedProject.id)}
+                      title={selectedProject.title}
+                      description="Explora este proyecto en 360 grados"
+                    />
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>

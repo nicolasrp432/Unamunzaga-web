@@ -8,6 +8,7 @@ import BolsaEmpleo from "./pages/BolsaEmpleo.jsx";
 import Contact from "./pages/Contact.jsx";
 import Blog from "./pages/Blog.jsx";
 import BlogPostDetail from "./pages/BlogPostDetail.jsx";
+import SearchResults from "./pages/SearchResults.tsx";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/blog/:slug" element={<BlogPostDetail />} />
         <Route path="/bolsa-empleo" element={<BolsaEmpleo />} />
         <Route path="/contacto" element={<Contact />} />
+        <Route path="/buscar" element={<SearchResults />} />
         <Route path="/other" element={<div className="text-center text-xl">Other Page - Coming Soon</div>} />
       </Routes>
     </Router>

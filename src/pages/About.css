@@ -6,25 +6,75 @@
 
 /* Hero Section */
 .about-hero {
-  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-light) 100%);
-  padding: 4rem 0 3rem;
+  background: linear-gradient(135deg, #0b1d4e 0%, #122a72 100%);
+  padding: 6rem 0 4rem;
   text-align: center;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: none;
+  position: relative;
+}
+
+.about-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%);
+  pointer-events: none;
 }
 
 .hero-content h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--color-text);
+  font-size: 4.25rem;
+  font-weight: 800;
+  color: #ffffff;
   margin-bottom: 1rem;
+  letter-spacing: -0.5px;
 }
 
 .hero-content p {
   font-size: 1.25rem;
-  color: var(--color-text-light);
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
+  color: rgba(255,255,255,0.9);
+  max-width: 760px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.7;
+}
+
+.hero-badges {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hero-btn-primary {
+  background: #ffffff;
+  color: #0b1d4e;
+}
+
+.hero-contact-inline {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #ffffff;
 }
 
 /* Company Stats */
@@ -501,6 +551,23 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .about-hero {
+    padding: 5rem 0 3rem;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-content p {
+    font-size: 1.1rem;
+    max-width: 90%;
+  }
+
+  .hero-badges .badge {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.95rem;
+  }
   .hero-content h1 {
     font-size: 2rem;
   }
@@ -532,14 +599,17 @@
     flex-direction: column;
     text-align: center;
     gap: 1rem;
+    animation: stepFadeIn 0.6s ease both;
   }
   
   .process-step:not(:last-child)::after {
-    left: 50%;
-    transform: translateX(-50%);
-    top: 4rem;
-    width: 2px;
-    height: calc(100% + 2rem);
+    display: none;
+  }
+  
+  .step-number {
+    margin-left: auto;
+    margin-right: auto;
+    animation: pulseGlow 2s ease-in-out infinite;
   }
   
   .team-grid {
@@ -560,35 +630,23 @@
   }
 }
 
+@keyframes stepFadeIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(255,255,255,0.08); }
+}
+
 @media (max-width: 480px) {
   .about-hero {
-    padding: 3rem 0 2rem;
+    padding: 3.5rem 0 2.5rem;
   }
   
   .hero-content h1 {
-    font-size: 1.75rem;
-  }
-  
-  .stat-card,
-  .value-card,
-  .cert-item {
-    padding: 2rem 1.5rem;
-  }
-  
-  .stat-number {
-    font-size: 2rem;
-  }
-  
-  .story-content h2 {
-    font-size: 2rem;
-  }
-  
-  .step-content h3 {
-    font-size: 1.25rem;
-  }
-  
-  .cta-content h2 {
-    font-size: 1.75rem;
+    font-size: 2.1rem;
   }
 }
 

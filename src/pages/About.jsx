@@ -19,6 +19,8 @@ import {
 import teamData from '../data/team.json';
 import './About.css';
 import ClientTrust from '../components/sections/ClientTrust';
+import { TestimonialsSection } from '../components/sections/TestimonialsSection';
+import { mockTestimonials } from '../data/mockData';
 
 const About = () => {
   const companyStats = [
@@ -85,12 +87,27 @@ const About = () => {
     <>
       <ModernNavbar />
       <div className="page about-page">
-      {/* Hero Section */}
       <section className="about-hero">
         <div className="container">
           <div className="hero-content">
-            <h1>Sobre Nosotros</h1>
-            <p>Transformamos espacios, creamos hogares y construimos sueños en Bizkaia desde 2009</p>
+            <h1 className="font-inter">Sobre Nosotros</h1>
+            <p>Transformamos espacios en Bilbao y Bizkaia con calidad, diseño y cumplimiento.</p>
+            <div className="hero-badges">
+              <span className="badge"><Star size={16} /> +10.000 proyectos</span>
+              <span className="badge"><Users size={16} /> Equipo propio especializado</span>
+              <span className="badge"><Shield size={16} /> Garantía y seguridad</span>
+            </div>
+            <div className="hero-actions">
+              <Link to="/contacto" className="btn hero-btn-primary">
+                <Phone size={18} /> Solicitar consulta
+              </Link>
+              <div className="hero-contact-inline">
+                <div className="contact-item"><Phone size={16} /><span>+34 944 07 84 27</span></div>
+                <div className="contact-item"><Phone size={16} /><span>+34 674 27 44 66</span></div>
+                <div className="contact-item"><Phone size={16} /><span>+34 629 11 65 15</span></div>
+                <div className="contact-item"><Mail size={16} /><span>contacto@unamunzagaobras.com</span></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -258,6 +275,8 @@ const About = () => {
         </div>
       </section>
 
+      <TestimonialsSection testimonials={mockTestimonials} />
+
       {/* Certifications and Awards */}
       <section className="certifications">
         <div className="container">
@@ -301,11 +320,11 @@ const About = () => {
               <div className="contact-info">
                 <div className="contact-item">
                   <Phone size={16} />
-                  <span>666 123 456</span>
+                  <span>+34 944 07 84 27</span>
                 </div>
                 <div className="contact-item">
                   <Mail size={16} />
-                  <span>info@unamunzaga.com</span>
+                  <span>contacto@unamunzagaobras.com</span>
                 </div>
                 <div className="contact-item">
                   <MapPin size={16} />
@@ -316,8 +335,8 @@ const About = () => {
           </div>
         </div>
       </section>
-    </div>
-    <ModernFooter />
+      </div>
+      <ModernFooter />
     </>
   );
 };

@@ -11,8 +11,14 @@ export async function askMistral(messages: ChatMessage[]): Promise<string> {
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Error proxy ${res.status}: ${text}`);
+    let body = '';
+    try {
+      body = await res.text();
+    } catch {
+      body = '';
+    }
+    console.error('Mistral proxy error', { status: res.status, body });
+    throw new Error(`Error proxy ${res.status}: ${body}`);
   }
 
   const data = await res.json();

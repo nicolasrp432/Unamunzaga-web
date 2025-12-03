@@ -5,7 +5,7 @@ export const SAMPLE_COLLECTION_SRC = 'https://kuula.co/share/collection/7Hf29?lo
 
 const KuulaTour = ({ id, title, description, src, fullScreen = false, children }) => {
     const [loading, setLoading] = useState(true);
-    const finalSrc = src || DEFAULT_KUULA_SRC;
+    const finalSrc = DEFAULT_KUULA_SRC;
 
     if (fullScreen) {
         return (
@@ -26,7 +26,7 @@ const KuulaTour = ({ id, title, description, src, fullScreen = false, children }
                     allow="xr-spatial-tracking; gyroscope; accelerometer"
                     allowFullScreen
                     scrolling="no"
-                    src={`${finalSrc}&chromeless=1`}
+                    src={finalSrc}
                     onLoad={() => setLoading(false)}
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', zIndex: 1 }}
                 />

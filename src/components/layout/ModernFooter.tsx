@@ -15,13 +15,13 @@ const ModernFooter: React.FC = () => {
     {
       icon: Phone,
       title: 'Teléfono',
-      content: '+34 944 123 456',
+      content: '+34 944 07 84 27',
       subtitle: 'Lun-Vie: 8:00-18:00'
     },
     {
       icon: Mail,
       title: 'Email',
-      content: 'info@unamunzagaobras.com',
+      content: 'contacto@unamunzagaobras.com',
       subtitle: 'Respuesta en 24h'
     },
     {

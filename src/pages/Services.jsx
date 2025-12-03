@@ -2,6 +2,7 @@ import { ModernNavbar } from '../components/layout/ModernNavbar';
 import ModernFooter from '../components/layout/ModernFooter';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import {
@@ -82,9 +83,10 @@ const Services = () => {
     visible: { opacity: 1, y: 0 }
   };
 
+  const navigate = useNavigate();
   const openModalFor = (service) => {
     setSelectedService(service);
-    setCtaOpen(true);
+    navigate('/contacto');
   };
 
   const onSubmit = (data) => {
@@ -93,7 +95,7 @@ const Services = () => {
       setCtaOpen(false);
       reset();
       const message = `Hola, soy ${data.name}. Quiero presupuesto para ${selectedService?.title}. ${data.message}`;
-      const url = `https://wa.me/34612345678?text=${encodeURIComponent(message)}`;
+      const url = `https://wa.me/34674274466?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
     }, 800);
   };
@@ -152,9 +154,6 @@ const Services = () => {
         </div>
       </div>
 
-      <ClientTrust images={clientLogos} />
-
-
 
       {/* Bloque asistente visual */}
       <div className="bg-gray-50">
@@ -164,8 +163,8 @@ const Services = () => {
             <p className="text-gray-600">Elige tu perfil y te mostramos ejemplos y soluciones.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
-            <a href="#contacto" className="px-6 py-3 rounded-xl bg-blue-900 text-white hover:bg-blue-800">Soy particular</a>
-            <a href="#contacto" className="px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300">Soy arquitecto / profesional</a>
+            <Link to="/contacto" className="px-6 py-3 rounded-xl bg-blue-900 text-white hover:bg-blue-800">Soy particular</Link>
+            <Link to="/contacto" className="px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300">Soy arquitecto / profesional</Link>
           </div>
         </div>
       </div>
@@ -180,9 +179,9 @@ const Services = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-3">¿Tienes un problema? Lo solucionamos hoy</h2>
             <p className="text-gray-600 mb-6">Llámanos o escríbenos y te asesoramos sin compromiso.</p>
             <div className="flex flex-wrap gap-3">
-              <a href="tel:+34944231213" className="px-5 py-3 rounded-xl bg-blue-900 text-white inline-flex items-center gap-2"><Phone className="w-5 h-5" /> +34 944 231 213</a>
-              <a href="mailto:info@unamunzagaobras.com" className="px-5 py-3 rounded-xl bg-gray-700 text-white inline-flex items-center gap-2"><Mail className="w-5 h-5" /> info@unamunzagaobras.com</a>
-              <button onClick={() => setCtaOpen(true)} className="px-5 py-3 rounded-xl bg-[#D54219] text-white font-semibold hover:bg-[#D54219]">Solicitar presupuesto</button>
+              <a href="tel:+34944078427" className="px-5 py-3 rounded-xl bg-blue-900 text-white inline-flex items-center gap-2"><Phone className="w-5 h-5" /> +34 944 07 84 27</a>
+              <a href="mailto:contacto@unamunzagaobras.com" className="px-5 py-3 rounded-xl bg-gray-700 text-white inline-flex items-center gap-2"><Mail className="w-5 h-5" /> contacto@unamunzagaobras.com</a>
+              <Link to="/contacto" className="px-5 py-3 rounded-xl bg-[#D54219] text-white font-semibold hover:bg-[#D54219]">Solicitar presupuesto</Link>
             </div>
           </div>
         </div>
@@ -195,7 +194,7 @@ const Services = () => {
       <NewsletterSignup />
 
       {/* Editor IA existente */}
-      <section className="section">
+      <section id="editor-ia" className="section">
         <div className="container">
           <div className="section-header text-center">
             <h2 className="section-title">Rediseña tu espacio con IA</h2>
@@ -204,6 +203,22 @@ const Services = () => {
           <DekorAIEmbed
             src="https://ai-space-canvas.lovable.app"
             title="AI Space Canvas"
+            height={800}
+            allow="camera; microphone; fullscreen"
+          />
+        </div>
+      </section>
+
+      {/* Editor IA adicional */}
+      <section id="editor-ia-2" className="section">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2 className="section-title">Rediseña tu espacio con IA</h2>
+            <p className="section-subtitle">Explora y diseña con la aplicación integrada en nuestra web.</p>
+          </div>
+          <DekorAIEmbed
+            src="https://floorplan-forge-73.lovable.app/"
+            title="Floorplan Forge"
             height={800}
             allow="camera; microphone; fullscreen"
           />

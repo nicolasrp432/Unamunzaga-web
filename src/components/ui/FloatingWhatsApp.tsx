@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { askMistral } from '../../lib/mistral';
+import servicesData from '../../data/services.json';
+import projectsData from '../../data/projects.json';
+type ServiceItem = { title: string };
+type ProjectItem = { title: string; location: string; featured?: boolean };
 
 const FloatingWhatsApp: React.FC = () => {
   const [isVisible] = useState(true);
@@ -10,13 +15,34 @@ const FloatingWhatsApp: React.FC = () => {
   const [messages, setMessages] = useState<Array<{ role: 'system' | 'user' | 'assistant'; content: string }>>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const navigate = useNavigate();
+  const messagesRef = useRef<HTMLDivElement | null>(null);
 
   const systemPrompt =
-    'Eres el asistente virtual de Unamunzaga Obras, empresa de reformas y construcción en Bilbao (Bizkaia). Ofreces: reforma integral, cocina, baño, locales comerciales, obra nueva y otros. Respondes en menos de 24 horas, con asesoría gratuita y presupuestos transparentes. Si el usuario pide contacto, ofrece: Teléfono +34 944 000 000, Email info@unamunzagaobras.com, Dirección Calle Principal 123, 48001 Bilbao. Contesta siempre en español, de forma clara, breve y profesional, y pregunta lo necesario para preparar un presupuesto.';
+    'Eres el asistente virtual de Unamunzaga Obras, empresa de reformas y construcción en Bilbao (Bizkaia). Ofreces: reforma integral, cocina, baño, locales comerciales, obra nueva y otros. Respondes en menos de 24 horas, con asesoría gratuita y presupuestos transparentes. Si el usuario pide contacto, ofrece: Teléfono +34 944 07 84 27, +34 674 27 44 66, +34 629 11 65 15, Email contacto@unamunzagaobras.com, Dirección Calle Licenciado Poza 30, 48011 Bilbao. Contesta siempre en español, de forma clara, breve y profesional, y pregunta lo necesario para preparar un presupuesto.';
+
+  const buildSiteContext = () => {
+    try {
+      const services = Array.isArray(servicesData)
+        ? (servicesData as ServiceItem[]).map((s) => s.title).filter(Boolean)
+        : [];
+      const featured = Array.isArray(projectsData)
+        ? (projectsData as ProjectItem[]).filter((p) => !!p.featured)
+        : [];
+      const featuredSummary = featured
+        .slice(0, 5)
+        .map((p) => `${p.title} (${p.location})`)
+        .join('; ');
+      const servicesSummary = services.slice(0, 12).join(', ');
+      return `Información de la web: Servicios: ${servicesSummary}. Proyectos destacados: ${featuredSummary}.`;
+    } catch {
+      return '';
+    }
+  };
 
   const handleWhatsAppClick = () => {
     const message = 'Hola, me gustaría solicitar información sobre sus servicios de reformas y construcción.';
-    const whatsappUrl = `https://wa.me/34612345678?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/34674274466?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -33,6 +59,11 @@ const FloatingWhatsApp: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const el = messagesRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, sending]);
+
   const handleSend = async () => {
     const text = input.trim();
     if (!text || sending) return;
@@ -42,7 +73,8 @@ const FloatingWhatsApp: React.FC = () => {
     setInput('');
     try {
       const history = messages.filter((m) => m.role !== 'system').slice(-8);
-      const reply = await askMistral([{ role: 'system', content: systemPrompt }, ...history, userMsg]);
+      const siteContext = buildSiteContext();
+      const reply = await askMistral([{ role: 'system', content: `${systemPrompt}\n${siteContext}` }, ...history, userMsg]);
       setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
     } catch {
       setMessages((prev) => [
@@ -63,8 +95,6 @@ const FloatingWhatsApp: React.FC = () => {
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
           className="fixed bottom-6 right-6 z-50"
-          onMouseEnter={() => setShowMenu(true)}
-          onMouseLeave={() => setShowMenu(false)}
         >
           <AnimatePresence>
             {showMenu && (
@@ -83,7 +113,7 @@ const FloatingWhatsApp: React.FC = () => {
                     <IconBrandWhatsapp className="mr-2" size={16} /> WhatsApp
                   </button>
                   <button
-                    onClick={handleWhatsAppClick}
+                    onClick={() => navigate('/contacto')}
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
                   >
                     Solicitar presupuesto
@@ -111,6 +141,7 @@ const FloatingWhatsApp: React.FC = () => {
             whileTap={{ scale: 0.9 }}
             className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 flex items-center justify-center"
             aria-label="Abrir chat de WhatsApp"
+            onClick={() => setShowMenu((v) => !v)}
           >
             <div className="relative">
               <IconBrandWhatsapp size={24} />
@@ -133,76 +164,84 @@ const FloatingWhatsApp: React.FC = () => {
           <AnimatePresence>
             {chatbotOpen && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] bg-black/50 backdrop-blur"
-                onClick={() => setChatbotOpen(false)}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 16 }}
+                transition={{ duration: 0.2 }}
+                className="absolute bottom-24 right-0 w-[360px] max-w-[90vw] bg-white rounded-2xl shadow-2xl p-4"
               >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0, y: -20 }}
-                  animate={{ scale: 1, opacity: 1, y: 0 }}
-                  exit={{ scale: 0.9, opacity: 0, y: -20 }}
-                  className="max-w-md w-full mx-auto bg-white rounded-2xl shadow-2xl mt-24 p-6"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-900">Asistente Virtual</h3>
-                    <p className="text-gray-600">Chatea con nosotros para obtener asesoría y presupuesto.</p>
+                <div className="mb-3 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Asistente Virtual</h3>
+                    <p className="text-sm text-gray-600">Asesoría inmediata y presupuestos transparentes.</p>
                   </div>
-                  <div className="flex flex-col h-96 border border-gray-200 rounded-xl overflow-hidden">
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-                      {messages.map((m, idx) => (
-                        <div
-                          key={idx}
-                          className={
-                            m.role === 'assistant'
-                              ? 'max-w-[85%] rounded-2xl px-4 py-3 bg-white shadow text-gray-900'
-                              : 'max-w-[85%] rounded-2xl px-4 py-3 bg-blue-600 text-white ml-auto'
-                          }
-                        >
-                          {m.content}
-                        </div>
-                      ))}
-                      {sending && (
-                        <div className="max-w-[60%] rounded-2xl px-4 py-3 bg-white shadow text-gray-900">
-                          Escribiendo...
-                        </div>
-                      )}
-                    </div>
-                    <div className="border-t border-gray-200 p-3 bg-white">
-                      <div className="flex gap-2">
-                        <input
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSend();
-                            }
-                          }}
-                          placeholder="Escribe tu consulta..."
-                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <button
-                          disabled={sending || input.trim() === ''}
-                          onClick={handleSend}
-                          className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300"
-                        >
-                          Enviar
-                        </button>
+                  <button
+                    onClick={() => setChatbotOpen(false)}
+                    className="px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+                <div className="flex flex-col h-96 border border-gray-200 rounded-xl overflow-hidden">
+                  <div ref={messagesRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+                    {messages.map((m, idx) => (
+                      <div
+                        key={idx}
+                        className={
+                          m.role === 'assistant'
+                            ? 'max-w-[85%] rounded-2xl px-4 py-3 bg-white shadow text-gray-900'
+                            : 'max-w-[85%] rounded-2xl px-4 py-3 bg-blue-600 text-white ml-auto'
+                        }
+                      >
+                        {m.content}
                       </div>
+                    ))}
+                    {sending && (
+                      <div className="max-w-[60%] rounded-2xl px-4 py-3 bg-white shadow text-gray-900">
+                        Escribiendo...
+                      </div>
+                    )}
+                  </div>
+                  <div className="border-t border-gray-200 p-3 bg-white">
+                    <div className="flex gap-2">
+                      <input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSend();
+                          }
+                        }}
+                        placeholder="Escribe tu consulta..."
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        disabled={sending || input.trim() === ''}
+                        onClick={handleSend}
+                        className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300"
+                      >
+                        Enviar
+                      </button>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {[
+                        'Quiero reformar una cocina',
+                        'Presupuesto para baño',
+                        'Disponibilidad para locales',
+                        'Asesoría en fachadas',
+                      ].map((q) => (
+                        <button
+                          key={q}
+                          onClick={() => setInput(q)}
+                          className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        >
+                          {q}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      onClick={() => setChatbotOpen(false)}
-                      className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    >
-                      Cerrar
-                    </button>
-                  </div>
-                </motion.div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

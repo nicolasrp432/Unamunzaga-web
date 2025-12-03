@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+import colors from 'tailwindcss/colors';
 
 export default {
   darkMode: "class",
@@ -7,7 +8,14 @@ export default {
     container: {
       center: true,
     },
-    extend: {},
+    extend: {
+      colors: {
+        amber: {
+          ...colors.amber,
+          500: 'rgb(221, 67, 39)'
+        }
+      }
+    },
   },
   plugins: [],
 };

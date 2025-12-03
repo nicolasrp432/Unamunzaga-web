@@ -42,7 +42,7 @@ export const CTASection: React.FC = () => {
       
       // Send WhatsApp message
       const whatsappMessage = `Hola, soy ${data.name}. Me gustaría solicitar un presupuesto para ${data.service}. Mi email es ${data.email} y mi teléfono es ${data.phone}. ${data.message}`;
-      const whatsappUrl = `https://wa.me/34612345678?text=${encodeURIComponent(whatsappMessage)}`;
+      const whatsappUrl = `https://wa.me/34674274466?text=${encodeURIComponent(whatsappMessage)}`;
       
       // Open WhatsApp in new tab
       window.open(whatsappUrl, '_blank');
@@ -68,16 +68,16 @@ export const CTASection: React.FC = () => {
 
   const openWhatsApp = () => {
     const message = 'Hola, me gustaría solicitar información sobre sus servicios de reformas.';
-    const whatsappUrl = `https://wa.me/34612345678?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/34674274466?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   const callPhone = () => {
-    window.open('tel:+34612345678');
+    window.open('tel:+34944078427');
   };
 
   const sendEmail = () => {
-    window.open('mailto:info@unamunzagaobras.com');
+    window.open('mailto:contacto@unamunzagaobras.com');
   };
 
   return (
