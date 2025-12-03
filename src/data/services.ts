@@ -24,7 +24,7 @@ export const servicesData: ServiceItem[] = [
       'Iluminación y domótica',
       'Gestión de licencias y permisos'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_2_1-2.jpg',
     icon: Building2,
     badges: ['Más solicitado', 'Ideal para viviendas'],
     microStat: '+30 cocinas renovadas este año'
@@ -41,7 +41,7 @@ export const servicesData: ServiceItem[] = [
       'Alicatados y solados modernos',
       'Optimización del espacio'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_3_2-2.jpg',
     icon: Bath,
     badges: ['Ideal para viviendas'],
     microStat: 'Proyectos con arquitectos y comunidades'
@@ -58,7 +58,7 @@ export const servicesData: ServiceItem[] = [
       'Climatización y ventilación',
       'Plazos ajustados para minimizar el cierre'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_4_3-2.jpg',
     icon: Store,
     badges: ['Recomendado para locales comerciales'],
     microStat: '+120 locales optimizados en Bilbao'
@@ -75,7 +75,7 @@ export const servicesData: ServiceItem[] = [
       'Eliminación de barreras arquitectónicas',
       'Inspección Técnica de Edificios (ITE)'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_5_4-2.jpg',
     icon: Building,
     badges: ['Proyectos con comunidades'],
     microStat: '+300 comunidades rehabilitadas'
@@ -92,7 +92,7 @@ export const servicesData: ServiceItem[] = [
       'Locales comerciales',
       'Oficinas'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_6_5-2.jpg',
     icon: Wrench,
     badges: ['Servicio integral']
   },
@@ -108,7 +108,7 @@ export const servicesData: ServiceItem[] = [
       'Control de ruido',
       'Calidad acústica'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_7_6-2.jpg',
     icon: Waves,
     badges: ['Mejora de confort']
   },
@@ -124,7 +124,7 @@ export const servicesData: ServiceItem[] = [
       'Instalaciones de fontanería',
       'Falsos techos caídos'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_8_7-2.jpg',
     icon: Wrench,
     badges: ['Respuesta rápida']
   },
@@ -140,7 +140,7 @@ export const servicesData: ServiceItem[] = [
       'Tejados, terrazas y azoteas',
       'Goteras, filtraciones y humedades'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_9_8-2.jpg',
     icon: Waves,
     badges: ['Protección contra agua']
   },
@@ -156,7 +156,7 @@ export const servicesData: ServiceItem[] = [
       'Acondicionamiento de zonas comunitarias',
       'Reparación de portales'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_10_9.jpg',
     icon: Building,
     badges: ['Comunidades']
   },
@@ -172,7 +172,7 @@ export const servicesData: ServiceItem[] = [
       'Columnas',
       'Forjados y muros'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_11_10.jpg',
     icon: Building2,
     badges: ['Ingeniería']
   },
@@ -188,7 +188,7 @@ export const servicesData: ServiceItem[] = [
       'Salva escaleras',
       'Domótica'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_12_11.jpg',
     icon: BadgeCheck,
     badges: ['Mejora accesible']
   },
@@ -204,7 +204,7 @@ export const servicesData: ServiceItem[] = [
       'Insonorización',
       'Decoración'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_13_12.jpg',
     icon: Wrench,
     badges: ['Versatilidad']
   },
@@ -220,7 +220,7 @@ export const servicesData: ServiceItem[] = [
       'Gestión de residuos',
       'Segregación de viviendas'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_14_13.jpg',
     icon: BadgeCheck,
     badges: ['Documentación']
   },
@@ -236,7 +236,7 @@ export const servicesData: ServiceItem[] = [
       'Cornisas',
       'Frisos'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_15_14.jpg',
     icon: Sparkles,
     badges: ['Decoración']
   },
@@ -252,7 +252,7 @@ export const servicesData: ServiceItem[] = [
       'Suelos, tarimas y revestimientos',
       'Transporte a vertedero'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_16_15.jpg',
     icon: Wrench,
     badges: ['Gestión responsable']
   },
@@ -268,7 +268,7 @@ export const servicesData: ServiceItem[] = [
       'Tarimas flotantes y parqués',
       'Escaleras'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_2_1-2.jpg',
     icon: Wrench,
     badges: ['A medida']
   },
@@ -284,7 +284,7 @@ export const servicesData: ServiceItem[] = [
       'Cableados de red para voz y datos',
       'Porteros, video vigilancia y domótica'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_3_2-2.jpg',
     icon: Zap,
     badges: ['Eficiencia y seguridad']
   },
@@ -300,7 +300,7 @@ export const servicesData: ServiceItem[] = [
       'Sustitución de tuberías de plomo, cobre y PVC',
       'Cálculo calorífico de la vivienda'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_4_3-2.jpg',
     icon: Bath,
     badges: ['Confort y eficiencia']
   },
@@ -316,7 +316,7 @@ export const servicesData: ServiceItem[] = [
       'Mantenimiento integral de edificaciones',
       'Remodelación de locales comerciales'
     ],
-    image: '/fondounamunzaga.jpg',
+    image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_5_4-2.jpg',
     icon: Building2,
     badges: ['Gestión integral']
   }

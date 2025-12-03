@@ -59,22 +59,26 @@ const ProjectDetail = () => {
 
   const getCategoryName = (category) => {
     const names = {
-      'vivienda': 'Vivienda',
-      'local': 'Local Comercial',
-      'cocina-bano': 'Cocina y Baño',
-      'fachada': 'Fachada',
-      'oficina': 'Oficina'
+      'trabajos-recientes': 'TRABAJOS RECIENTES',
+      'bares-restaurantes': 'BARES Y RESTAURANTES',
+      'viviendas': 'VIVIENDA',
+      'fachadas': 'FACHADA',
+      'locales-comerciales': 'LOCAL COMERCIAL',
+      'tejados': 'TEJADOS',
+      'insonorizacion': 'INSONORIZACIÓN'
     };
     return names[category] || category;
   };
 
   const getCategoryIcon = (category) => {
     const icons = {
-      'vivienda': '🏠',
-      'local': '🏪',
-      'cocina-bano': '🚿',
-      'fachada': '🏢',
-      'oficina': '💼'
+      'trabajos-recientes': '🆕',
+      'bares-restaurantes': '🍽️',
+      'viviendas': '🏠',
+      'fachadas': '🏢',
+      'locales-comerciales': '🏪',
+      'tejados': '🏚️',
+      'insonorizacion': '🔇'
     };
     return icons[category] || '📋';
   };
@@ -256,6 +260,23 @@ const ProjectDetail = () => {
                       <CheckCircle size={16} className="service-icon" />
                       <span>{service}</span>
                     </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="details-gallery">
+                <h3>Galería del Proyecto</h3>
+                <div className="details-gallery-grid">
+                  {project.images.map((image, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={`details-gallery-item ${index === currentImageIndex ? 'active' : ''}`}
+                      onClick={() => setCurrentImageIndex(index)}
+                      aria-label={`Ver imagen ${index + 1} en grande`}
+                    >
+                      <img src={image} alt={`Galería ${index + 1}`} loading="lazy" />
+                    </button>
                   ))}
                 </div>
               </div>

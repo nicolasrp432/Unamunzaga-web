@@ -117,7 +117,7 @@ const Services = () => {
                 <button
                   key={f}
                   onClick={() => setSelectedFilter(selectedFilter === f ? 'all' : f)}
-                  className={`px-3 py-2 rounded-full text-sm font-semibold transition-all ${selectedFilter === f ? 'bg-amber-500 text-white' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                  className={`px-3 py-2 rounded-full text-sm font-semibold transition-all ${selectedFilter === f ? 'bg-[#D54219] text-white' : 'bg-white/20 text-white hover:bg-white/30'}`}
                 >
                   {f === 'all' ? 'Todos' : f}
                 </button>
@@ -131,15 +131,15 @@ const Services = () => {
       
 
       {/* Stats rápidos */}
-      <div className="bg-amber-50">
+      <div className="bg-[#D54219]/10">
         <div className="max-w-7xl mx-auto px-4 py-6 flex flex-wrap gap-6 items-center justify-between">
           <div className="flex items-center gap-3">
-            <BadgeCheck className="w-6 h-6 text-amber-500" />
-            <span className="font-semibold text-amber-700">+1000 obras finalizadas en Bilbao y Bizkaia</span>
+            <BadgeCheck className="w-6 h-6 text-[#D54219]" />
+            <span className="font-semibold text-[#D54219]">+1000 obras finalizadas en Bilbao y Bizkaia</span>
           </div>
           <div className="flex items-center gap-3">
-            <Star className="w-6 h-6 text-amber-500" />
-            <span className="text-amber-700">Clientes particulares y profesionales confían en nosotros</span>
+            <Star className="w-6 h-6 text-[#D54219]" />
+            <span className="text-[#D54219]">Clientes particulares y profesionales confían en nosotros</span>
           </div>
         </div>
       </div>
@@ -152,6 +152,8 @@ const Services = () => {
           ))}
         </div>
       </div>
+
+      <ClientTrust images={clientLogos} />
 
       {/* Prueba social: logos/testimonios mini */}
       <div className="max-w-7xl mx-auto px-4 pb-12">
@@ -194,7 +196,7 @@ const Services = () => {
             <div className="flex flex-wrap gap-3">
               <a href="tel:+34944231213" className="px-5 py-3 rounded-xl bg-blue-900 text-white inline-flex items-center gap-2"><Phone className="w-5 h-5" /> +34 944 231 213</a>
               <a href="mailto:info@unamunzagaobras.com" className="px-5 py-3 rounded-xl bg-gray-700 text-white inline-flex items-center gap-2"><Mail className="w-5 h-5" /> info@unamunzagaobras.com</a>
-              <button onClick={() => setCtaOpen(true)} className="px-5 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600">Solicitar presupuesto</button>
+              <button onClick={() => setCtaOpen(true)} className="px-5 py-3 rounded-xl bg-[#D54219] text-white font-semibold hover:bg-[#D54219]">Solicitar presupuesto</button>
             </div>
           </div>
         </div>
@@ -248,7 +250,7 @@ const Services = () => {
                   {errors.message && <p className="text-sm text-red-600 mt-1">{errors.message.message}</p>}
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  <button type="submit" className="px-6 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 inline-flex items-center gap-2">
+                  <button type="submit" className="px-6 py-3 rounded-xl bg-[#D54219] text-white font-semibold hover:bg-[#D54219] inline-flex items-center gap-2">
                     <MessageCircle className="w-5 h-5" /> Enviar solicitud
                   </button>
                   <button type="button" onClick={() => setCtaOpen(false)} className="px-6 py-3 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300">Cerrar</button>

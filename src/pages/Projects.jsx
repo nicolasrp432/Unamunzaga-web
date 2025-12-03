@@ -13,9 +13,16 @@ const Projects = () => {
   const [viewMode, setViewMode] = useState('grid');
 
   const categories = useMemo(() => {
-    const cats = new Set();
-    projectsData.forEach(project => cats.add(project.category));
-    return ['all', ...Array.from(cats)];
+    return [
+      'all',
+      'trabajos-recientes',
+      'bares-restaurantes',
+      'viviendas',
+      'fachadas',
+      'locales-comerciales',
+      'tejados',
+      'insonorizacion'
+    ];
   }, []);
 
   const years = useMemo(() => {
@@ -27,7 +34,11 @@ const Projects = () => {
   const filteredProjects = useMemo(() => {
     let filtered = projectsData;
 
-    if (selectedCategory !== 'all') {
+    if (selectedCategory === 'trabajos-recientes') {
+      const currentYear = new Date().getFullYear();
+      const threshold = currentYear - 1;
+      filtered = filtered.filter(project => project.year >= threshold);
+    } else if (selectedCategory !== 'all') {
       filtered = filtered.filter(project => project.category === selectedCategory);
     }
 
@@ -59,22 +70,26 @@ const Projects = () => {
   const getCategoryName = (category) => {
     const names = {
       'all': 'Todos',
-      'vivienda': 'Viviendas',
-      'local': 'Locales Comerciales',
-      'cocina-bano': 'Cocinas y Baños',
-      'fachada': 'Fachadas',
-      'oficina': 'Oficinas'
+      'trabajos-recientes': 'TRABAJOS RECIENTES',
+      'bares-restaurantes': 'BARES Y RESTAURANTES',
+      'viviendas': 'VIVIENDAS',
+      'fachadas': 'FACHADAS',
+      'locales-comerciales': 'LOCALES COMERCIALES',
+      'tejados': 'TEJADOS',
+      'insonorizacion': 'INSONORIZACIÓN'
     };
     return names[category] || category;
   };
 
   const getCategoryIcon = (category) => {
     const icons = {
-      'vivienda': '🏠',
-      'local': '🏪',
-      'cocina-bano': '🚿',
-      'fachada': '🏢',
-      'oficina': '💼'
+      'trabajos-recientes': '🆕',
+      'bares-restaurantes': '🍽️',
+      'viviendas': '🏠',
+      'fachadas': '🏢',
+      'locales-comerciales': '🏪',
+      'tejados': '🏚️',
+      'insonorizacion': '🔇'
     };
     return icons[category] || '📋';
   };
@@ -85,8 +100,8 @@ const Projects = () => {
       <div className="page projects-page">
       <section className="page-header">
         <div className="container">
-          <h1>Nuestros Proyectos</h1>
-          <p>Descubre nuestra cartera de proyectos realizados en Bizkaia</p>
+          <h1>Nuestros trabajos</h1>
+          <p>Hechos con esmero por el mejor equipo de profesionales</p>
         </div>
       </section>
 

@@ -7,6 +7,7 @@ import { TestimonialsSection } from '../components/sections/TestimonialsSection'
 import { CTASection } from '../components/sections/CTASection';
 import { BlogSection } from '../components/sections/BlogSection';
 import { ServicesPreview } from '../components/sections/ServicesPreview';
+import ClientTrust from '../components/sections/ClientTrust';
 import ModernFooter from '../components/layout/ModernFooter';
 import FloatingWhatsApp from '../components/ui/FloatingWhatsApp';
 import SEOHead from '../components/layout/SEOHead';
@@ -27,6 +28,7 @@ const Home: React.FC = () => {
           <TestimonialsSection testimonials={mockTestimonials} />
           <CTASection />
           <BlogSection posts={mockBlogPosts} />
+          <ClientTrust />
         </main>
         <ModernFooter />
         <FloatingWhatsApp />

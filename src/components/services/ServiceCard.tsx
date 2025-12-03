@@ -83,13 +83,6 @@ export const ServiceCard: React.FC<Props> = ({ service, onQuote, showCTAs = fals
               <MessageCircle className="w-4 h-4" /> Solicita tu presupuesto fácil
             </motion.button>
           )}
-
-          <Link
-            to={`/servicios#${service.id}`}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-blue-200 text-blue-900 hover:bg-blue-50"
-          >
-            Ver servicio <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
       </div>
     </motion.section>

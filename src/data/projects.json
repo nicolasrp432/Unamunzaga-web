@@ -3,15 +3,15 @@
     "id": 1,
     "title": "Reforma Integral de Vivienda en Bilbao",
     "description": "Reforma completa de vivienda de 120m² en el centro de Bilbao. Incluye cocina, baños, electricidad y fontanería nueva.",
-    "category": "vivienda",
+    "category": "viviendas",
     "location": "Bilbao, Bizkaia",
     "year": 2024,
     "duration": "3 meses",
     "budget": "45.000€",
     "images": [
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Modern%20kitchen%20renovation%20in%20Bilbao%20apartment%2C%20white%20cabinets%2C%20marble%20countertops%2C%20stainless%20steel%20appliances%2C%20bright%20natural%20lighting&image_size=landscape_16_9",
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Renovated%20bathroom%20with%20modern%20tiles%2C%20walk-in%20shower%2C%20contemporary%20fixtures%2C%20Bilbao%20style%20interior%20design&image_size=landscape_16_9",
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Living%20room%20after%20renovation%2C%20open%20concept%20space%2C%20modern%20lighting%2C%20wooden%20floors%2C%20Bilbao%20apartment%20interior&image_size=landscape_16_9"
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_147_viviendas-56.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_153_viviendas-50.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_169_viviendas-34.jpg"
     ],
     "services": ["Cocina", "Baño", "Electricidad", "Fontanería", "Pintura"],
     "testimonial": "Excelente trabajo de Unamunzaga. Quedamos muy satisfechos con la reforma integral de nuestra vivienda. Profesionales y puntuales.",
@@ -23,15 +23,15 @@
     "id": 2,
     "title": "Reforma de Local Comercial en Santurtzi",
     "description": "Transformación de local comercial de 80m² en moderno restaurante. Incluye instalaciones industriales y decoración.",
-    "category": "local",
+    "category": "bares-restaurantes",
     "location": "Santurtzi, Bizkaia",
     "year": 2024,
     "duration": "2.5 meses",
     "budget": "65.000€",
     "images": [
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Commercial%20space%20renovation%20into%20restaurant%2C%20industrial%20kitchen%2C%20modern%20dining%20area%2C%20Santurtzi%20commercial%20interior&image_size=landscape_16_9",
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Restaurant%20bar%20counter%20renovation%2C%20modern%20design%2C%20wood%20and%20metal%20finishes%2C%20professional%20lighting&image_size=landscape_16_9",
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Commercial%20bathroom%20renovation%2C%20industrial%20style%2C%20durable%20materials%2C%20modern%20fixtures&image_size=landscape_16_9"
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_101_bares-22.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_109_bares-15.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_104_bares-2.jpg"
     ],
     "services": ["Instalaciones", "Fontanería", "Electricidad", "Acústica", "Decoración"],
     "testimonial": "Transformaron completamente nuestro local. Ahora tenemos un restaurante moderno y funcional que atrae a muchos clientes.",
@@ -43,14 +43,15 @@
     "id": 3,
     "title": "Reforma de Cocina y Baño en Getxo",
     "description": "Actualización de cocina y baño principal en vivienda unifamiliar. Diseño moderno y funcional.",
-    "category": "cocina-bano",
+    "category": "viviendas",
     "location": "Getxo, Bizkaia",
     "year": 2023,
     "duration": "6 semanas",
     "budget": "25.000€",
     "images": [
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Modern%20kitchen%20renovation%20in%20Getxo%20home%2C%20minimalist%20design%2C%20white%20and%20gray%20colors%2C%20high-end%20appliances&image_size=landscape_16_9",
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Renovated%20bathroom%20in%20Getxo%20villa%2C%20modern%20tiles%2C%20double%20vanity%2C%20rain%20shower%2C%20contemporary%20Basque%20style&image_size=landscape_16_9"
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_172_viviendas-31.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_160_viviendas-43.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_146_viviendas-7.jpg"
     ],
     "services": ["Cocina", "Baño", "Electricidad", "Fontanería"],
     "testimonial": "Nos encantó el resultado. La cocina y el baño quedaron exactamente como los habíamos soñado.",
@@ -61,14 +62,15 @@
     "id": 4,
     "title": "Reforma de Fachada en Portugalete",
     "description": "Rehabilitación completa de fachada en edificio de viviendas. Incluye aislamiento y renovación de cubiertas.",
-    "category": "fachada",
+    "category": "fachadas",
     "location": "Portugalete, Bizkaia",
     "year": 2023,
     "duration": "4 meses",
     "budget": "120.000€",
     "images": [
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Building%20facade%20renovation%20in%20Portugalete%2C%20modern%20insulation%20system%2C%20new%20windows%2C%20contemporary%20Basque%20architecture&image_size=landscape_16_9",
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Before%20and%20after%20facade%20renovation%2C%20improved%20energy%20efficiency%2C%20modern%20appearance%2C%20Portugalete%20building&image_size=landscape_16_9"
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_214_fachadas-10.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_206_fachadas-9.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_210_fachadas-5.jpg"
     ],
     "services": ["Fachada", "Aislamiento", "Cubierta", "Ventanas"],
     "testimonial": "El edificio parece nuevo. El aislamiento ha mejorado mucho el confort térmico y la factura energética.",
@@ -79,14 +81,15 @@
     "id": 5,
     "title": "Oficina Corporativa en Barakaldo",
     "description": "Diseño y construcción de oficinas corporativas de 200m². Espacios abiertos y salas de reunión modernas.",
-    "category": "oficina",
+    "category": "locales-comerciales",
     "location": "Barakaldo, Bizkaia",
     "year": 2024,
     "duration": "2 meses",
     "budget": "85.000€",
     "images": [
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Modern%20office%20space%20in%20Barakaldo%2C%20open%20plan%20design%2C%20glass%20partitions%2C%20contemporary%20furniture%2C%20professional%20lighting&image_size=landscape_16_9",
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Corporate%20meeting%20room%20renovation%2C%20modern%20design%2C%20audiovisual%20equipment%2C%20Barakaldo%20business%20center&image_size=landscape_16_9"
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_12_centro-de-Bilbao-EL-CANO-1.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_13_centro-de-Bilbao-EL-CANO-10.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_21_centro-de-Bilbao-EL-CANO-7.jpg"
     ],
     "services": ["Oficina", "Electricidad", "Redes", "Climatización", "Mobiliario"],
     "testimonial": "Nuestras nuevas oficinas son funcionales y modernas. Ha mejorado mucho el ambiente de trabajo.",
@@ -98,14 +101,15 @@
     "id": 6,
     "title": "Vivienda Unifamiliar en Leioa",
     "description": "Construcción de vivienda unifamiliar de 180m² con jardín y piscina. Diseño contemporáneo y sostenible.",
-    "category": "vivienda",
+    "category": "viviendas",
     "location": "Leioa, Bizkaia",
     "year": 2023,
     "duration": "8 meses",
     "budget": "280.000€",
     "images": [
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Contemporary%20single-family%20home%20in%20Leioa%2C%20modern%20architecture%2C%20large%20windows%2C%20garden%20with%20pool%2C%20Basque%20Country%20design&image_size=landscape_16_9",
-      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Modern%20living%20room%20interior%2C%20open%20concept%2C%20floor-to-ceiling%20windows%2C%20minimalist%20design%2C%20Leioa%20villa&image_size=landscape_16_9"
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_170_viviendas-33.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_171_viviendas-32.jpg",
+      "/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_175_viviendas-1.jpg"
     ],
     "services": ["Construcción", "Diseño", "Jardín", "Piscina", "Energías Renovables"],
     "testimonial": "Nuestra casa de ensueño hecha realidad. La calidad de construcción es excepcional.",

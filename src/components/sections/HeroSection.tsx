@@ -33,12 +33,18 @@ const heroTitles = [
     suffix: "hecha realidad"
   }
 ];
+const mobileMessages = [
+  "En Bilbao para clientes exigentes",
+  "Más de 10.000 proyectos ejecutados",
+  "Excelencia en cada reforma"
+];
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
   const [currentImage, setCurrentImage] = useState(0);
   const [currentTitle, setCurrentTitle] = useState(0);
+  const [currentMobileMsg, setCurrentMobileMsg] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -54,6 +60,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentMobileMsg((prev) => (prev + 1) % mobileMessages.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
   const nextImage = () => {
     setCurrentImage((prev) => (prev + 1) % heroImages.length);
   };
@@ -65,7 +78,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
   
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative min-h-[70vh] md:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Carousel */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-blue-800/70 to-amber-600/60 z-10" />
@@ -83,7 +96,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
         </AnimatePresence>
         
         {/* Carousel Controls */}
-        <div className="absolute inset-0 z-50 hidden md:flex items-center justify-between px-4 pointer-events-none">
+        <div className="absolute inset-0 z-50 flex items-center justify-between px-4 pointer-events-none">
           <button 
             onClick={prevImage}
             className="p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white transition-all pointer-events-auto transform hover:scale-110"
@@ -101,7 +114,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
         </div>
 
         {/* Carousel Indicators */}
-        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-20 hidden md:flex space-x-2">
           {heroImages.map((_, idx) => (
             <button
               key={idx}
@@ -129,7 +142,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="space-y-6 min-h-[160px]" // Min height to prevent layout shift
+            className="space-y-4 md:space-y-6 min-h-[160px]" // Min height to prevent layout shift
           >
             <AnimatePresence mode="wait">
               <motion.h1
@@ -138,18 +151,30 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="text-4xl md:text-5xl lg:text-7xl font-bold text-white leading-tight"
+                className="font-inter text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"
               >
                 {heroTitles[currentTitle].prefix}{' '}
                 <span className="text-amber-400 block sm:inline">
                   {heroTitles[currentTitle].highlight}
                 </span>
-                <br />
-                {heroTitles[currentTitle].suffix}
-              </motion.h1>
-            </AnimatePresence>
+                <br className="hidden md:block" />
+              {heroTitles[currentTitle].suffix}
+            </motion.h1>
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={`msg-${currentMobileMsg}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+              className="md:hidden text-base font-bold tracking-wide text-amber-300 max-w-xs mx-auto leading-relaxed"
+            >
+              {mobileMessages[currentMobileMsg]}
+            </motion.p>
+          </AnimatePresence>
             
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+            <p className="hidden md:block text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
               En Bilbao para clientes exigentes: particulares y profesionales. 
               <br className="hidden md:block" />
               Confía en los expertos con más de{' '}
@@ -162,7 +187,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
             initial={{ opacity: 0, y: 40 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12"
+            className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8 mt-12"
           >
             {kpis.map((kpi, index) => (
               <motion.div
