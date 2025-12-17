@@ -1,98 +1,46 @@
 import { ModernNavbar } from '../components/layout/ModernNavbar';
 import ModernFooter from '../components/layout/ModernFooter';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  Tag, 
-  Search, 
+import {
+  Calendar,
+  Clock,
+  User,
+  Search,
   ArrowRight,
   BookOpen,
-  TrendingUp,
-  Filter
+  ExternalLink
 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { useExternalNews } from '../hooks/useExternalNews';
 import './Blog.css';
 
 const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedTag, setSelectedTag] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Replaced internal hook with external news hook
+  const { news, loading, error } = useExternalNews(20);
+
+  // Newsletter state
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState('idle');
+  const [newsletterError, setNewsletterError] = useState('');
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  useEffect(() => {
-    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://news.google.com/rss/search?q=reformas%20OR%20construcción&hl=es&gl=ES&ceid=ES:es');
-    setLoading(true);
-    setError(null);
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        const items = Array.isArray(data.items) ? data.items : [];
-        setPosts(items);
-      })
-      .catch(e => setError('No se pudo cargar el contenido de actualidad'))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const categories = useMemo(() => {
-    const cats = new Set();
-    posts.forEach(p => {
-      if (Array.isArray(p.categories)) p.categories.forEach(c => cats.add(c));
-    });
-    return ['all', ...Array.from(cats)];
-  }, [posts]);
-
-  const allTags = useMemo(() => {
-    const tags = new Set();
-    posts.forEach(p => {
-      if (Array.isArray(p.categories)) p.categories.forEach(t => tags.add(t));
-    });
-    return ['all', ...Array.from(tags)];
-  }, [posts]);
-
-  const filteredPosts = useMemo(() => {
-    let filtered = [...posts];
-    if (debouncedSearch) {
-      const q = debouncedSearch.toLowerCase();
-      filtered = filtered.filter(post =>
-        (post.title || '').toLowerCase().includes(q) ||
-        (post.description || '').toLowerCase().includes(q) ||
-        (post.content || '').toLowerCase().includes(q) ||
-        (post.author || '').toLowerCase().includes(q)
-      );
-    }
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(post => Array.isArray(post.categories) && post.categories.includes(selectedCategory));
-    }
-    if (selectedTag !== 'all') {
-      filtered = filtered.filter(post => Array.isArray(post.categories) && post.categories.includes(selectedTag));
-    }
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.pubDate) - new Date(a.pubDate);
-        case 'oldest':
-          return new Date(a.pubDate) - new Date(b.pubDate);
-        case 'title':
-          return (a.title || '').localeCompare(b.title || '');
-        default:
-          return 0;
-      }
-    });
-    return filtered;
-  }, [posts, debouncedSearch, selectedCategory, selectedTag, sortBy]);
+  const filteredNews = useMemo(() => {
+    if (!debouncedSearch) return news;
+    const q = debouncedSearch.toLowerCase();
+    return news.filter(item =>
+      item.title.toLowerCase().includes(q) ||
+      item.description.toLowerCase().includes(q)
+    );
+  }, [news, debouncedSearch]);
 
   const formatDate = (dateString) => {
+    if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -101,305 +49,201 @@ const Blog = () => {
     });
   };
 
-  const getReadingTime = (content) => {
-    const wordsPerMinute = 200;
-    const wordCount = content.split(' ').length;
-    const readingTime = Math.ceil(wordCount / wordsPerMinute);
-    return readingTime;
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+
+    setNewsletterStatus('loading');
+    setNewsletterError('');
+
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert([{
+          email: newsletterEmail,
+          status: 'active',
+          source: 'blog'
+        }]);
+
+      if (error) {
+        if (error.code === '23505') {
+          setNewsletterError('Este correo ya está suscrito a nuestra newsletter.');
+        } else {
+          setNewsletterError('Hubo un error al procesar tu suscripción. Por favor, inténtalo de nuevo.');
+        }
+        setNewsletterStatus('error');
+        return;
+      }
+
+      setNewsletterStatus('success');
+      setNewsletterEmail('');
+      setTimeout(() => setNewsletterStatus('idle'), 4000);
+    } catch (error) {
+      console.error('Error subscribing to newsletter:', error);
+      setNewsletterError('Hubo un error al procesar tu suscripción. Por favor, inténtalo de nuevo.');
+      setNewsletterStatus('error');
+    }
   };
-
-  const getCategoryName = (category) => category;
-  const getCategoryColor = () => '#6b7280';
-
-  const readingMinutes = (post) => getReadingTime((post.content || post.description || '')); 
 
   return (
     <>
       <ModernNavbar />
       <div className="page blog-page">
-      {/* Hero Section */}
-      <section className="blog-hero">
-        <div className="container">
-          <div className="hero-content">
-            <BookOpen size={48} className="hero-icon" />
-            <h1>Blog de Reformas y Diseño</h1>
-            <p>
-              Descubre consejos, tendencias e ideas inspiradoras para transformar tu hogar o negocio. 
-              Nuestros expertos comparten su conocimiento para ayudarte a crear espacios únicos.
+        {/* Hero Section */}
+        <section className="blog-hero">
+          <div className="container">
+            <div className="hero-content">
+              <BookOpen size={48} className="hero-icon" />
+              <h1>Noticias de Arquitectura y Diseño</h1>
+              <p>
+                Mantente al día con las últimas tendencias, historia y conceptos del mundo de la arquitectura y el diseño de interiores.
+                Contenido curado de fuentes globales.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Search Only (Filters removed as they don't apply easily to Wikipedia mix) */}
+        <section className="blog-filters">
+          <div className="container">
+            <div className="filters-container justify-center">
+              <div className="search-group w-full max-w-2xl">
+                <div className="search-input-container">
+                  <Search size={20} className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Buscar temas..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                    aria-label="Buscar noticias"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Results Summary */}
+        <section className="results-summary">
+          <div className="container">
+            <p className="results-text">
+              Mostrando <strong>{filteredNews.length}</strong> artículos encontrados
             </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Search and Filters */}
-      <section className="blog-filters">
-        <div className="container">
-          <div className="filters-container">
-            {/* Search Bar */}
-            <div className="search-group">
-              <div className="search-input-container">
-                <Search size={20} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Buscar artículos..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                  aria-label="Buscar artículos"
-                />
+        {/* Blog Posts Grid */}
+        <section className="blog-posts">
+          <div className="container">
+            {loading ? (
+              <div className="no-results"><h3>Cargando noticias...</h3></div>
+            ) : error ? (
+              <div className="no-results"><h3>{error}</h3></div>
+            ) : filteredNews.length > 0 ? (
+              <div className="posts-grid">
+                {filteredNews.map((item) => (
+                  <article key={item.id} className="post-card external-post">
+                    <div className="post-image">
+                      <img
+                        src={item.thumbnail || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}
+                        alt={item.title}
+                        loading="lazy"
+                        className="object-cover w-full h-full"
+                      />
+                      <div className="post-category bg-blue-600">
+                        {item.source}
+                      </div>
+                    </div>
+
+                    <div className="post-content">
+                      <div className="post-meta">
+                        {/* 
+                        <div className="meta-item">
+                          <Calendar size={14} />
+                          <span>{formatDate(item.date)}</span>
+                        </div>
+                        */}
+                        <div className="meta-item">
+                          <User size={14} />
+                          <span>Wikipedia</span>
+                        </div>
+                      </div>
+
+                      <h2 className="post-title">
+                        <a href={item.url} target="_blank" rel="noopener noreferrer">
+                          {item.title}
+                        </a>
+                      </h2>
+
+                      <p className="post-excerpt line-clamp-3">{item.description}</p>
+
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" className="read-more">
+                        Leer artículo completo
+                        <ExternalLink size={16} className="ml-1" />
+                      </a>
+                    </div>
+                  </article>
+                ))}
               </div>
-            </div>
-
-            {/* Filter Groups */}
-            <div className="filter-groups">
-              <div className="filter-group">
-                <label><Filter size={16} /> Categoría</label>
-                <select 
-                  value={selectedCategory} 
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="filter-select"
+            ) : (
+              <div className="no-results">
+                <div className="no-results-icon">📝</div>
+                <h3>No se encontraron artículos</h3>
+                <p>Intenta buscar con otros términos.</p>
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="btn btn-primary"
                 >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {category === 'all' ? 'Todas las categorías' : getCategoryName(category)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label><Tag size={16} /> Etiqueta</label>
-                <select 
-                  value={selectedTag} 
-                  onChange={(e) => setSelectedTag(e.target.value)}
-                  className="filter-select"
-                >
-                  {allTags.map(tag => (
-                    <option key={tag} value={tag}>
-                      {tag === 'all' ? 'Todas las etiquetas' : tag}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label><TrendingUp size={16} /> Ordenar</label>
-                <select 
-                  value={sortBy} 
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="newest">Más recientes</option>
-                  <option value="oldest">Más antiguos</option>
-                  <option value="popular">Más populares</option>
-                  <option value="title">Por título</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Active Filters */}
-            {(selectedCategory !== 'all' || selectedTag !== 'all' || searchTerm) && (
-              <div className="active-filters">
-                <span className="filters-label">Filtros activos:</span>
-                {searchTerm && (
-                  <span className="active-filter">
-                    🔍 "{searchTerm}"
-                    <button onClick={() => setSearchTerm('')}>×</button>
-                  </span>
-                )}
-                {selectedCategory !== 'all' && (
-                  <span className="active-filter" style={{ backgroundColor: getCategoryColor(selectedCategory) }}>
-                    {getCategoryName(selectedCategory)}
-                    <button onClick={() => setSelectedCategory('all')}>×</button>
-                  </span>
-                )}
-                {selectedTag !== 'all' && (
-                  <span className="active-filter">
-                    🏷️ {selectedTag}
-                    <button onClick={() => setSelectedTag('all')}>×</button>
-                  </span>
-                )}
-                <button 
-                  className="clear-all-btn"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategory('all');
-                    setSelectedTag('all');
-                  }}
-                >
-                  Limpiar todo
+                  Limpiar búsqueda
                 </button>
               </div>
             )}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Results Summary */}
-      <section className="results-summary">
-        <div className="container">
-          <p className="results-text">
-            Mostrando <strong>{filteredPosts.length}</strong> artículos
-          </p>
-        </div>
-      </section>
-
-      {/* Blog Posts Grid */}
-      <section className="blog-posts">
-        <div className="container">
-          {loading ? (
-            <div className="no-results"><h3>Cargando contenido...</h3></div>
-          ) : error ? (
-            <div className="no-results"><h3>{error}</h3></div>
-          ) : filteredPosts.length > 0 ? (
-            <div className="posts-grid">
-              {filteredPosts.map((post) => (
-                <article key={post.guid || post.link} className="post-card">
-                  <div className="post-image">
-                    <img 
-                      src={post.thumbnail || '/placeholder.jpg'} 
-                      alt={post.title}
-                      loading="lazy"
-                    />
-                    <div className="post-category" style={{ backgroundColor: getCategoryColor() }}>
-                      {Array.isArray(post.categories) && post.categories[0] ? getCategoryName(post.categories[0]) : 'Actualidad'}
-                    </div>
-                  </div>
-                  
-                  <div className="post-content">
-                    <div className="post-meta">
-                      <div className="meta-item">
-                        <Calendar size={14} />
-                        <span>{formatDate(post.pubDate)}</span>
-                      </div>
-                      <div className="meta-item">
-                        <Clock size={14} />
-                        <span>{readingMinutes(post)} min lectura</span>
-                      </div>
-                      <div className="meta-item">
-                        <User size={14} />
-                        <span>{post.author || new URL(post.link).hostname}</span>
-                      </div>
-                    </div>
-                    
-                    <h2 className="post-title">
-                      <a href={post.link} target="_blank" rel="noopener noreferrer">{post.title}</a>
-                    </h2>
-                    
-                    <p className="post-excerpt">{post.description}</p>
-                    
-                    <div className="post-tags">
-                      {(Array.isArray(post.categories) ? post.categories : []).slice(0, 3).map((tag, index) => (
-                        <span key={index} className="tag-item">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <a href={post.link} target="_blank" rel="noopener noreferrer" className="read-more">
-                      Leer más
-                      <ArrowRight size={16} />
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="no-results">
-              <div className="no-results-icon">📝</div>
-              <h3>No se encontraron artículos</h3>
-              <p>Intenta ajustar los filtros o utilizar otros términos de búsqueda.</p>
-              <button 
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('all');
-                  setSelectedTag('all');
-                }}
-                className="btn btn-primary"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Featured Posts Section */}
-      {filteredPosts.filter(post => post.featured).length > 0 && (
-        <section className="featured-posts">
+        {/* Newsletter CTA */}
+        <section className="newsletter-cta">
           <div className="container">
-            <h2 className="section-title">Artículos Destacados</h2>
-            <div className="featured-grid">
-              {filteredPosts
-                .filter(post => post.featured)
-                .slice(0, 3)
-                .map((post) => (
-                  <article key={post.slug} className="featured-card">
-                    <div className="featured-image">
-                      <img 
-                        src={post.featured_image} 
-                        alt={post.title}
-                        loading="lazy"
-                      />
-                      <div className="featured-badge">
-                        <TrendingUp size={16} />
-                        Destacado
-                      </div>
-                    </div>
-                    <div className="featured-content">
-                      <div className="featured-meta">
-                        <span className="featured-category" style={{ backgroundColor: getCategoryColor(post.category) }}>
-                          {getCategoryName(post.category)}
-                        </span>
-                        <span className="featured-date">{formatDate(post.date)}</span>
-                      </div>
-                      <h3 className="featured-title">
-                        <Link to={`/blog/${post.slug}`}>{post.title}</Link>
-                      </h3>
-                      <p className="featured-excerpt">{post.excerpt}</p>
-                      <div className="featured-footer">
-                        <div className="featured-author">
-                          <User size={14} />
-                          <span>{post.author}</span>
-                        </div>
-                        <Link to={`/blog/${post.slug}`} className="featured-link">
-                          Leer artículo
-                          <ArrowRight size={14} />
-                        </Link>
-                      </div>
-                    </div>
-                  </article>
-                ))}
+            {/* Same newsletter content */}
+            <div className="newsletter-content">
+              <div className="newsletter-text">
+                <h3>¿Quieres recibir más consejos?</h3>
+                <p>Suscríbete a nuestra newsletter y recibe artículos exclusivos sobre reformas y diseño de interiores.</p>
+              </div>
+              <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+                <input
+                  type="email"
+                  placeholder="Tu correo electrónico"
+                  className="newsletter-input"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={newsletterStatus === 'loading'}
+                >
+                  {newsletterStatus === 'loading' ? 'Enviando...' : 'Suscribirme'}
+                </button>
+              </form>
+              {newsletterStatus === 'success' && (
+                <p className="newsletter-success" style={{ color: '#10b981', marginTop: '1rem' }}>
+                  ¡Gracias! Te hemos suscrito correctamente.
+                </p>
+              )}
+              {newsletterStatus === 'error' && (
+                <p className="newsletter-error" style={{ color: '#ef4444', marginTop: '1rem' }}>
+                  {newsletterError}
+                </p>
+              )}
             </div>
           </div>
         </section>
-      )}
-
-      {/* Newsletter CTA */}
-      <section className="newsletter-cta">
-        <div className="container">
-          <div className="newsletter-content">
-            <div className="newsletter-text">
-              <h3>¿Quieres recibir más consejos?</h3>
-              <p>Suscríbete a nuestra newsletter y recibe artículos exclusivos sobre reformas y diseño de interiores.</p>
-            </div>
-            <form className="newsletter-form">
-              <input
-                type="email"
-                placeholder="Tu correo electrónico"
-                className="newsletter-input"
-                required
-              />
-              <button type="submit" className="btn btn-primary">
-                Suscribirme
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-    </div>
-    <ModernFooter />
-  </>
+      </div>
+      <ModernFooter />
+    </>
   );
 };
 

@@ -3,11 +3,12 @@ export type ChatMessage = {
   content: string;
 };
 
-export async function askMistral(messages: ChatMessage[]): Promise<string> {
+export async function askMistral(messages: ChatMessage[], opts?: { signal?: AbortSignal }): Promise<string> {
   const res = await fetch('/api/mistral-chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages }),
+    signal: opts?.signal,
   });
 
   if (!res.ok) {

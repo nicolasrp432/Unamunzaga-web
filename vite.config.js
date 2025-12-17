@@ -33,8 +33,8 @@ export default defineConfig({
               },
               body: JSON.stringify({
                 model: 'mistral-small-latest',
-                temperature: 0.3,
-                max_tokens: 512,
+                temperature: 0.2,
+                max_tokens: 256,
                 messages,
               }),
             })

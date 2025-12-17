@@ -1,19 +1,47 @@
 import React, { useState } from 'react';
 import { Mail, Send } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 const NewsletterSignup = () => {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('idle');
+  const [status, setStatus] = useState('idle'); // idle, loading, success, error
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) return;
+
     setStatus('loading');
-    setTimeout(() => {
+    setErrorMessage('');
+
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert([{
+          email: email,
+          status: 'active',
+          source: 'services'
+        }]);
+
+      if (error) {
+        // Handle duplicate email error
+        if (error.code === '23505') {
+          setErrorMessage('Este correo ya está suscrito a nuestra newsletter.');
+        } else {
+          setErrorMessage('Hubo un error al procesar tu suscripción. Por favor, inténtalo de nuevo.');
+        }
+        setStatus('error');
+        return;
+      }
+
       setStatus('success');
       setEmail('');
       setTimeout(() => setStatus('idle'), 4000);
-    }, 1200);
+    } catch (error) {
+      console.error('Error subscribing to newsletter:', error);
+      setErrorMessage('Hubo un error al procesar tu suscripción. Por favor, inténtalo de nuevo.');
+      setStatus('error');
+    }
   };
 
   return (
@@ -41,11 +69,10 @@ const NewsletterSignup = () => {
             <button
               type="submit"
               disabled={status === 'loading'}
-              className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white shadow-md transition-colors duration-200 ${
-                status === 'loading'
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-amber-500 hover:bg-amber-600'
-              }`}
+              className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white shadow-md transition-colors duration-200 ${status === 'loading'
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-amber-500 hover:bg-amber-600'
+                }`}
             >
               {status === 'loading' ? (
                 <>
@@ -62,6 +89,9 @@ const NewsletterSignup = () => {
           </form>
           {status === 'success' && (
             <p className="mt-4 text-green-700">¡Gracias! Te hemos suscrito correctamente.</p>
+          )}
+          {status === 'error' && (
+            <p className="mt-4 text-red-700">{errorMessage}</p>
           )}
         </div>
       </div>

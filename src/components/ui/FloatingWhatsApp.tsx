@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { askMistral } from '../../lib/mistral';
-import servicesData from '../../data/services.json';
-import projectsData from '../../data/projects.json';
+import { useProjects } from '../../hooks/useProjects';
+import { useServices } from '../../hooks/useServices';
+
 type ServiceItem = { title: string };
-type ProjectItem = { title: string; location: string; featured?: boolean };
 
 const FloatingWhatsApp: React.FC = () => {
   const [isVisible] = useState(true);
@@ -17,28 +17,29 @@ const FloatingWhatsApp: React.FC = () => {
   const [sending, setSending] = useState(false);
   const navigate = useNavigate();
   const messagesRef = useRef<HTMLDivElement | null>(null);
+  const controllerRef = useRef<AbortController | null>(null);
+
+  const { projects } = useProjects();
+  const { services } = useServices();
 
   const systemPrompt =
     'Eres el asistente virtual de Unamunzaga Obras, empresa de reformas y construcción en Bilbao (Bizkaia). Ofreces: reforma integral, cocina, baño, locales comerciales, obra nueva y otros. Respondes en menos de 24 horas, con asesoría gratuita y presupuestos transparentes. Si el usuario pide contacto, ofrece: Teléfono +34 944 07 84 27, +34 674 27 44 66, +34 629 11 65 15, Email contacto@unamunzagaobras.com, Dirección Calle Licenciado Poza 30, 48011 Bilbao. Contesta siempre en español, de forma clara, breve y profesional, y pregunta lo necesario para preparar un presupuesto.';
 
   const buildSiteContext = () => {
     try {
-      const services = Array.isArray(servicesData)
-        ? (servicesData as ServiceItem[]).map((s) => s.title).filter(Boolean)
-        : [];
-      const featured = Array.isArray(projectsData)
-        ? (projectsData as ProjectItem[]).filter((p) => !!p.featured)
-        : [];
+      const servicesNames = services.map((s) => s.title).filter(Boolean);
+      const featured = projects.filter((p) => p.featured);
       const featuredSummary = featured
-        .slice(0, 5)
+        .slice(0, 3)
         .map((p) => `${p.title} (${p.location})`)
         .join('; ');
-      const servicesSummary = services.slice(0, 12).join(', ');
+      const servicesSummary = servicesNames.slice(0, 6).join(', ');
       return `Información de la web: Servicios: ${servicesSummary}. Proyectos destacados: ${featuredSummary}.`;
     } catch {
       return '';
     }
   };
+  const siteContext = useMemo(buildSiteContext, [projects, services]);
 
   const handleWhatsAppClick = () => {
     const message = 'Hola, me gustaría solicitar información sobre sus servicios de reformas y construcción.';
@@ -72,9 +73,13 @@ const FloatingWhatsApp: React.FC = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     try {
-      const history = messages.filter((m) => m.role !== 'system').slice(-8);
-      const siteContext = buildSiteContext();
-      const reply = await askMistral([{ role: 'system', content: `${systemPrompt}\n${siteContext}` }, ...history, userMsg]);
+      controllerRef.current?.abort();
+      controllerRef.current = new AbortController();
+      const history = messages.filter((m) => m.role !== 'system').slice(-6);
+      const reply = await askMistral(
+        [{ role: 'system', content: `${systemPrompt}\n${siteContext}` }, ...history, userMsg],
+        { signal: controllerRef.current.signal }
+      );
       setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
     } catch {
       setMessages((prev) => [
@@ -85,6 +90,12 @@ const FloatingWhatsApp: React.FC = () => {
       setSending(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.abort();
+    };
+  }, []);
 
   return (
     <AnimatePresence>

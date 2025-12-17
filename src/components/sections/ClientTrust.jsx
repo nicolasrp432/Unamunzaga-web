@@ -26,7 +26,7 @@ const ClientTrust = ({
   return (
     <section className="client-trust">
       <div className="container">
-        <h2 className="trust-title">{title}</h2>
+        <h2 className="trust-title text-blue-900">{title}</h2>
         <div className="logos-rows">
           <div className="logos-row">
             {row1.map((src) => (

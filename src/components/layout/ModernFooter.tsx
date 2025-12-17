@@ -3,25 +3,28 @@ import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Linkedin } from 'lucide-react';
 import FloatingWhatsApp from '../ui/FloatingWhatsApp';
 
+import { useSiteSettings } from '../../hooks/useSiteSettings';
+
 const ModernFooter: React.FC = () => {
+  const { settings } = useSiteSettings();
 
   const contactInfo = [
     {
       icon: MapPin,
       title: 'Dirección',
-      content: 'Calle Licenciado Poza 30, Bilbao 48011',
-      subtitle: 'Vizcaya, País Vasco'
+      content: settings ? `${settings.address_street}, ${settings.address_city} ${settings.address_zip}` : 'Cargando...',
+      subtitle: settings ? `${settings.address_province}, España` : '...'
     },
     {
       icon: Phone,
       title: 'Teléfono',
-      content: '+34 944 07 84 27',
-      subtitle: 'Lun-Vie: 8:00-18:00'
+      content: settings?.phone_primary || 'Cargando...',
+      subtitle: settings?.business_hours || 'Lun-Vie: 8:00-18:00'
     },
     {
       icon: Mail,
       title: 'Email',
-      content: 'contacto@unamunzagaobras.com',
+      content: settings?.email_contact || 'Cargando...',
       subtitle: 'Respuesta en 24h'
     },
     {
@@ -97,11 +100,11 @@ const ModernFooter: React.FC = () => {
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-white mb-2">Unamunzaga Obras</h2>
               <p className="text-gray-300 leading-relaxed">
-                Más de 20 años de experiencia en reformas y construcción en Bilbao. 
+                Más de 20 años de experiencia en reformas y construcción en Bilbao.
                 Especialistas en reformas integrales, obra nueva y rehabilitación de espacios.
               </p>
             </div>
-            
+
             {/* Social Links */}
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => {
@@ -199,7 +202,7 @@ const ModernFooter: React.FC = () => {
             >
               © 2024 Unamunzaga Obras. Todos los derechos reservados.
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}

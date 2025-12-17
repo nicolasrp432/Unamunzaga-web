@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Testimonial } from '../../types';
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Quote, Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface TestimonialsSectionProps {
   testimonials: Testimonial[];
+  loading?: boolean;
+  error?: string | null;
 }
 
-export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials }) => {
+export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials, loading, error }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [direction, setDirection] = useState(0); // 0: next, 1: prev
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || loading || error || testimonials.length === 0) return;
 
     const interval = setInterval(() => {
       setDirection(0);
@@ -22,7 +24,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, testimonials.length]);
+  }, [isAutoPlaying, testimonials.length, loading, error]);
 
   const nextTestimonial = () => {
     setDirection(0);
@@ -63,6 +65,27 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
   const swipePower = (offset: number, velocity: number) => {
     return Math.abs(offset) * velocity;
   };
+
+  if (loading) {
+    return (
+      <section id="testimonials" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+            Lo que dicen nuestros clientes
+          </h2>
+          <div className="flex justify-center p-12">
+            <Loader2 className="w-12 h-12 animate-spin text-blue-900" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || testimonials.length === 0) {
+    // Don't render section if error or no content, or render placeholder
+    // For now, render nothing to avoid broken UI
+    return null;
+  }
 
   return (
     <section id="testimonials" className="py-20 bg-white">

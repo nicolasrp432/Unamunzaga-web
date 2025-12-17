@@ -1,33 +1,27 @@
 /* Home Page Dark Theme Styles */
 .home-page {
-    --bg-dark: #0f172a; /* Slate 900 */
-    --bg-card: #1e293b; /* Slate 800 */
-    --bg-card-hover: #334155; /* Slate 700 */
-    --text-main: #f8fafc; /* Slate 50 */
-    --text-muted: #94a3b8; /* Slate 400 */
+    --bg-dark: #0f172a;
+    /* Slate 900 */
+    --bg-card: #1e293b;
+    /* Slate 800 */
+    --bg-card-hover: #334155;
+    /* Slate 700 */
+    --text-main: #f8fafc;
+    /* Slate 50 */
+    --text-muted: #94a3b8;
+    /* Slate 400 */
     --accent: rgb(213, 66, 25);
     --accent-hover: rgb(178, 58, 20);
-    --border-color: #334155; /* Slate 700 */
+    --border-color: #334155;
+    /* Slate 700 */
 
     background-color: var(--bg-dark);
     color: var(--text-main);
 }
 
-/* Navbar Overrides */
-.home-page nav {
-    background-color: rgba(15, 23, 42, 0.95) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-}
 
-.home-page nav a, 
-.home-page nav button:not(.bg-amber-500) {
-    color: var(--text-muted) !important;
-}
+/* Navbar Overrides Removed */
 
-.home-page nav a:hover, 
-.home-page nav button:not(.bg-amber-500):hover {
-    color: var(--accent) !important;
-}
 
 /* Button Overrides */
 .home-page .bg-amber-500,
@@ -48,13 +42,13 @@
 
 /* Section Overrides */
 .home-page section {
-    background-color: transparent !important;
+    background-color: white !important;
 }
 
 .home-page #portfolio,
 .home-page #testimonials,
 .home-page #blog,
-.home-page .services-preview,
+/* .services-preview removed to allow white bg */
 .home-page .bg-gray-50 {
     background-color: var(--bg-dark) !important;
 }
@@ -65,33 +59,49 @@
     border-top: 1px solid var(--border-color);
 }
 
-/* Typography Overrides */
-.home-page h1, 
-.home-page h2, 
-.home-page h3, 
-.home-page h4, 
-.home-page h5, 
+/* Typography Overrides - Relaxed for specific classes */
+.home-page h1,
+/* h2 removed to allow specifics */
+.home-page h3,
+.home-page h4,
+.home-page h5,
 .home-page h6 {
     color: var(--text-main) !important;
 }
 
-.home-page p, 
-.home-page span, 
+/* Allow h2 to differ if specified, otherwise default to main */
+.home-page h2:not(.text-blue-900):not(.text-gray-900) {
+    color: var(--text-main);
+}
+
+.home-page p,
+.home-page span,
 .home-page li {
     color: var(--text-muted);
 }
 
+/* Relax text overrides to allow dark text on white backgrounds */
 .home-page .text-gray-600,
 .home-page .text-gray-700,
 .home-page .text-gray-500,
-.home-page .text-gray-800,
-.home-page .text-gray-900 {
-    color: var(--text-muted) !important;
+.home-page .text-gray-800 {
+    /* Removed !important to allow component classes to win */
+    color: var(--text-muted);
 }
+
+/* But keep generic text-gray-900 as white in dark mode contexts if needed, 
+   OR rely on component specificity. 
+   Better approach: Only override if NOT inside a white section? 
+   No, simpler to just remove !important and let utility classes work. */
 
 .home-page h2.text-gray-900,
 .home-page h3.text-gray-900 {
-    color: var(--text-main) !important;
+    /* Allow specific dark text classes to work */
+    color: #ffffff;
+}
+
+.home-page .text-blue-900 {
+    color: #1e3a8a !important;
 }
 
 /* Card Overrides (Portfolio, Services, etc) */
@@ -124,7 +134,8 @@
 
 /* Footer Override */
 .home-page footer {
-    background-color: #020617 !important; /* Darker than bg-dark */
+    background-color: #020617 !important;
+    /* Darker than bg-dark */
     border-top: 1px solid var(--border-color);
 }
 
@@ -141,14 +152,14 @@
 }
 
 /* Specific fixes for elements that might need it */
-.home-page input, 
+.home-page input,
 .home-page textarea {
     background-color: var(--bg-card) !important;
     border-color: var(--border-color) !important;
     color: var(--text-main) !important;
 }
 
-.home-page input:focus, 
+.home-page input:focus,
 .home-page textarea:focus {
     border-color: var(--accent) !important;
     outline: none;
@@ -157,12 +168,13 @@
 
 /* Hero Section adjustments */
 .home-page .hero-section h1 {
-    color: white !important; /* Ensure hero text stays white on image */
+    color: white !important;
+    /* Ensure hero text stays white on image */
 }
 
 /* Stats/KPIs */
 .home-page .hero-section .bg-white\/10 {
     background-color: rgba(30, 41, 59, 0.8) !important;
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }

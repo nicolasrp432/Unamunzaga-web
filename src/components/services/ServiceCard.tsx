@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, MessageCircle, Sparkles } from 'lucide-react';
+import { Check, MessageCircle, Sparkles, Home, Utensils, Bath, Building, LayoutTemplate as Wall, Zap, Droplets, PaintBucket as Paint } from 'lucide-react';
 import type { ServiceItem } from '../../data/services';
+import type { Service } from '../../hooks/useServices';
 
 type Props = {
-  service: ServiceItem;
-  onQuote?: (service: ServiceItem) => void;
+  service: ServiceItem | Service;
+  onQuote?: (service: ServiceItem | Service) => void;
   showCTAs?: boolean;
   compact?: boolean;
 };
@@ -25,9 +26,28 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
+const iconMap: Record<string, any> = {
+  home: Home,
+  utensils: Utensils,
+  bath: Bath,
+  building: Building,
+  fachada: Wall,
+  wall: Wall,
+  electricidad: Zap,
+  zap: Zap,
+  fontaneria: Droplets,
+  droplets: Droplets,
+  paint: Paint,
+  acabados: Paint
+};
+
 export const ServiceCard: React.FC<Props> = ({ service, onQuote, showCTAs = false, compact = false }) => {
-  const Icon = service.icon;
-  const features = compact ? service.features.slice(0, 3) : service.features;
+  const Icon = typeof service.icon === 'string'
+    ? (iconMap[service.icon.toLowerCase()] || Home)
+    : (service.icon || Home);
+
+  const features = compact ? (service.features || []).slice(0, 3) : (service.features || []);
+  const imageUrl = (service as any).image_url || service.image || 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800';
 
   return (
     <motion.section
@@ -39,7 +59,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onQuote, showCTAs = fals
       className="service-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 group"
     >
       <div className="relative h-52 service-image">
-        <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <img src={imageUrl} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           {service.badges?.map((b) => (
             <span key={b} className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-900 text-white">
@@ -48,7 +68,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onQuote, showCTAs = fals
           ))}
         </div>
         <div className="service-icon-badge">
-          {Icon ? <Icon className="w-10 h-10" /> : null}
+          <Icon className="w-10 h-10 text-blue-900" />
         </div>
       </div>
 

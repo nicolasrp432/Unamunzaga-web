@@ -16,11 +16,13 @@ export interface Testimonial {
   id: string;
   client_name: string;
   company?: string;
+  role?: string;
   avatar_url?: string;
   logo_url?: string;
   rating: number;
   testimonial_text: string;
   project?: string;
+  created_at?: string;
 }
 
 export interface BlogPost {

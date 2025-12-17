@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Calendar, 
-  MapPin, 
-  ExternalLink, 
+import {
+  Calendar,
+  MapPin,
+  ExternalLink,
   X,
   Filter,
   ChevronLeft,
@@ -13,7 +13,7 @@ import { cn } from '../../lib/utils';
 import KuulaTour from '../kuula/KuulaTour';
 
 export type ProjectData = {
-  id: number;
+  id: string | number;
   title: string;
   description: string;
   category: string;
@@ -22,6 +22,7 @@ export type ProjectData = {
   duration: string;
   budget: string;
   images: string[];
+  services?: string[];
   testimonial?: string;
   client_name?: string;
   featured?: boolean;
@@ -38,7 +39,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const categories = useMemo(() => ['Todos', ...Array.from(new Set(projects.map(p => p.category)))], [projects]);
-  
+
   const filteredProjects = useMemo(() => (
     selectedCategory === 'Todos' ? projects : projects.filter(p => p.category === selectedCategory)
   ), [projects, selectedCategory]);
@@ -59,10 +60,10 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
             Proyectos Destacados
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl max-w-3xl mx-auto text-gray-300">
             Descubre nuestras últimas obras y transformaciones. Cada proyecto refleja nuestro compromiso con la excelencia y la innovación.
           </p>
         </motion.div>
@@ -97,11 +98,11 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                       </div>
                     </div>
                     <div className="p-6">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
-                      <p className="text-gray-600 mb-4 line-clamp-2">{project.description}</p>
+                      <h3 className="text-xl font-bold mb-2 text-white">{project.title}</h3>
+                      <p className="mb-4 line-clamp-2 text-gray-300">{project.description}</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-blue-900 font-semibold">{project.category}</span>
-                        <span className="text-gray-600 text-sm">📅 {project.year}</span>
+                        <span className="text-blue-500 font-semibold">{project.category}</span>
+                        <span className="text-sm text-gray-400">📅 {project.year}</span>
                       </div>
                     </div>
                   </motion.div>
@@ -131,8 +132,8 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
               className={cn(
                 'px-6 py-2 rounded-full font-medium transition-all duration-300',
                 selectedCategory === category
-                  ? 'bg-blue-900 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-900 shadow-md'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-slate-800 text-gray-300 border border-slate-700 hover:bg-slate-700 hover:text-white shadow-md'
               )}
             >
               {category}
@@ -165,12 +166,12 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                <div className="absolute top-4 left-4">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-900 text-white">
-                    {project.category}
-                  </span>
-                </div>
+
+                  <div className="absolute top-4 left-4">
+                    <span className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-900 text-white">
+                      {project.category}
+                    </span>
+                  </div>
 
                   {/* Hover Overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -181,14 +182,14 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                 </div>
 
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-900 transition-colors">
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-blue-500 transition-colors text-white">
                     {project.title}
                   </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-2">
+                  <p className="mb-4 line-clamp-2 text-gray-300">
                     {project.description}
                   </p>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+
+                  <div className="flex items-center justify-between text-sm mb-4 text-gray-400">
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-4 h-4" />
                       <span>{project.year}</span>
@@ -200,8 +201,8 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-blue-900 font-semibold">{project.category}</span>
-                    <span className="text-gray-600">{project.duration}</span>
+                    <span className="text-blue-500 font-semibold">{project.category}</span>
+                    <span className="text-gray-400">{project.duration}</span>
                   </div>
                 </div>
               </motion.div>
@@ -242,12 +243,18 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
               <div className="relative">
                 <div className="aspect-video bg-gray-100">
                   <img
-                    src={selectedProject.images[currentImageIndex]}
                     alt={`${selectedProject.title} - Imagen ${currentImageIndex + 1}`}
                     className="w-full h-full object-cover"
                   />
+                  {/* View Details Overlay Button */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/30">
+                    <a href={`/proyectos/${selectedProject.id}`} className="px-6 py-3 bg-white text-blue-900 rounded-full font-bold shadow-lg hover:scale-105 transition-transform flex items-center gap-2">
+                      <ExternalLink size={20} />
+                      Ver Detalles Completos
+                    </a>
+                  </div>
                 </div>
-                
+
                 {selectedProject.images.length > 1 && (
                   <>
                     <button
@@ -332,7 +339,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects }) 
                     )}
                   </div>
                 )}
-                
+
               </div>
             </motion.div>
           </motion.div>
