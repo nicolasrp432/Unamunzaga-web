@@ -73,6 +73,29 @@ const FloatingWhatsApp: React.FC = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     try {
+      if (import.meta.env.PROD) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              'El chatbot no está disponible en producción sin backend configurado. Configura MISTRAL_API_KEY y un endpoint seguro.',
+          },
+        ]);
+        return;
+      }
+      const ping = await fetch('/api/mistral-ping').catch(() => null);
+      if (!ping || !ping.ok) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              'Error de configuración: falta MISTRAL_API_KEY o el proxy no está operativo. Revisa las variables de entorno.',
+          },
+        ]);
+        return;
+      }
       controllerRef.current?.abort();
       controllerRef.current = new AbortController();
       const history = messages.filter((m) => m.role !== 'system').slice(-6);
@@ -114,30 +137,30 @@ const FloatingWhatsApp: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 16 }}
                 transition={{ duration: 0.2 }}
-                className="absolute bottom-20 right-0 bg-white rounded-lg shadow-2xl p-3 w-64"
+                className="absolute bottom-20 right-0 bg-slate-900 text-white rounded-lg shadow-2xl p-3 w-64"
               >
                 <div className="space-y-2">
                   <button
                     onClick={handleWhatsAppClick}
-                    className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 flex items-center justify-center"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 flex items-center justify-center"
                   >
                     <IconBrandWhatsapp className="mr-2" size={16} /> WhatsApp
                   </button>
                   <button
                     onClick={() => navigate('/contacto')}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
                   >
                     Solicitar presupuesto
                   </button>
                   <button
                     onClick={handleWhatsAppClick}
-                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
+                    className="w-full bg-slate-600 hover:bg-slate-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
                   >
                     Consultar disponibilidad
                   </button>
                   <button
                     onClick={openChatbot}
-                    className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
                   >
                     Hablar con chatbot
                   </button>
@@ -150,7 +173,7 @@ const FloatingWhatsApp: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 flex items-center justify-center"
+            className="bg-green-600 hover:bg-green-700 text-white rounded-full p-4 shadow-lg transition-all duration-300 flex items-center justify-center"
             aria-label="Abrir chat de WhatsApp"
             onClick={() => setShowMenu((v) => !v)}
           >
@@ -168,7 +191,7 @@ const FloatingWhatsApp: React.FC = () => {
             <motion.div
               animate={{ scale: [1, 1.5, 1], opacity: [0.7, 0, 0.7] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inset-0 bg-green-500 rounded-full"
+              className="absolute inset-0 bg-green-600 rounded-full"
               style={{ zIndex: -1 }}
             />
           )}

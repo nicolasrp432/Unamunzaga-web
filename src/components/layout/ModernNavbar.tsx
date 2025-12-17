@@ -338,7 +338,7 @@ export const ModernNavbar: React.FC = () => {
                         'flex items-center space-x-2 text-sm font-medium',
                         isActive
                           ? 'text-blue-900 bg-blue-50'
-                          : 'text-blue-900 hover:text-blue-800 hover:bg-blue-50'
+                          : 'text-blue-900 hover:text-blue-900 hover:bg-blue-100'
                       )}
                     >
                       <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
@@ -392,15 +392,15 @@ export const ModernNavbar: React.FC = () => {
                                     <div
                                       key={feature.id}
                                       onClick={() => scrollToSection(feature.href)}
-                                      className="group cursor-pointer p-3 rounded-xl hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100"
+                                      className="group cursor-pointer p-3 rounded-xl hover:bg-blue-100 transition-colors border border-transparent hover:border-blue-200"
                                     >
                                       <div className="flex items-start gap-3">
-                                        <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                        <div className="p-2 bg-blue-100 text-blue-700 rounded-lg group-hover:bg-blue-700 group-hover:text-white transition-colors">
                                           <FeatureIcon className="w-4 h-4" />
                                         </div>
                                         <div>
-                                          <div className="font-semibold text-gray-900 text-sm group-hover:text-blue-700">{feature.title}</div>
-                                          <div className="text-xs text-gray-500 mt-0.5 leading-snug">{feature.description}</div>
+                                          <div className="font-semibold text-gray-900 text-sm group-hover:text-blue-900">{feature.title}</div>
+                                          <div className="text-xs text-gray-700 mt-0.5 leading-snug">{feature.description}</div>
                                         </div>
                                       </div>
                                     </div>
@@ -419,11 +419,11 @@ export const ModernNavbar: React.FC = () => {
                                     <div
                                       key={subItem.id}
                                       onClick={() => scrollToSection(subItem.href)}
-                                      className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white hover:shadow-sm cursor-pointer transition-all group"
+                                      className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-blue-100 cursor-pointer transition-all group"
                                     >
-                                      <SubIcon className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
-                                      <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{subItem.title}</span>
-                                      <ArrowRight className="w-3.5 h-3.5 ml-auto text-gray-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                                      <SubIcon className="w-4 h-4 text-gray-500 group-hover:text-blue-900 transition-colors" />
+                                      <span className="text-sm font-medium text-gray-800 group-hover:text-blue-900">{subItem.title}</span>
+                                      <ArrowRight className="w-3.5 h-3.5 ml-auto text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                                     </div>
                                   );
                                 })}
@@ -431,7 +431,7 @@ export const ModernNavbar: React.FC = () => {
 
                               <button
                                 onClick={() => scrollToSection(item.href)}
-                                className="w-full mt-4 py-2 px-4 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all flex items-center justify-center gap-2"
+                                className="w-full mt-4 py-2 px-4 bg-white border border-gray-200 text-gray-800 rounded-lg text-sm font-medium hover:bg-blue-100 hover:text-blue-900 hover:border-blue-300 transition-all flex items-center justify-center gap-2"
                               >
                                 <span>Ir a {item.label}</span>
                                 <ArrowRight className="w-4 h-4" />
@@ -455,7 +455,7 @@ export const ModernNavbar: React.FC = () => {
                 onClick={() => setIsSearchOpen(true)}
                 className={cn(
                   'p-2 rounded-lg transition-colors duration-300',
-                  'text-gray-700 hover:text-blue-900 hover:bg-blue-50'
+                  'text-gray-800 hover:text-blue-900 hover:bg-blue-100'
                 )}
               >
                 <Search className="w-5 h-5" />
@@ -482,7 +482,7 @@ export const ModernNavbar: React.FC = () => {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className={cn(
                   'lg:hidden p-2 rounded-lg transition-colors duration-300',
-                  'text-gray-700 hover:text-blue-900 hover:bg-blue-50'
+                  'text-gray-800 hover:text-blue-900 hover:bg-blue-100'
                 )}
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

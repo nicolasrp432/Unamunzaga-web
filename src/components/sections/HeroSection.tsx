@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import CountUp from 'react-countup';
 import { Play, Calculator } from 'lucide-react';
@@ -53,7 +53,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
   const isInView = useInView(ref, { once: true, amount: 0.3 });
   const [currentTitle, setCurrentTitle] = useState(0);
   const [currentMobileMsg, setCurrentMobileMsg] = useState(0);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+  const videoRefs = useRef<HTMLVideoElement[]>([]);
   const navigate = useNavigate();
+
+  const isMobile = useMemo(() => {
+    if (typeof navigator === 'undefined') return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -68,6 +75,42 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
     }, 3000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const tryAutoplay = async () => {
+      if (!isMobile) return;
+      try {
+        const plays = videoRefs.current
+          .filter(Boolean)
+          .map((v) => {
+            v.muted = true;
+            v.playsInline = true;
+            return v.play();
+          });
+        const results = await Promise.allSettled(plays);
+        const rejected = results.some((r) => r.status === 'rejected');
+        setAutoplayBlocked(rejected);
+      } catch {
+        setAutoplayBlocked(true);
+      }
+    };
+    // delay a bit to ensure videos are mounted by Swiper
+    const id = setTimeout(tryAutoplay, 300);
+    return () => clearTimeout(id);
+  }, [isMobile]);
+
+  const handleUserPlay = () => {
+    videoRefs.current.forEach((v) => {
+      try {
+        if (v) {
+          v.muted = true;
+          v.playsInline = true;
+          v.play().catch(() => {});
+        }
+      } catch {}
+    });
+    setAutoplayBlocked(false);
+  };
 
   return (
     <section id="home" className="relative h-[90vh] md:h-screen flex items-center justify-center overflow-hidden">
@@ -96,11 +139,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
                 loop
                 muted
                 playsInline
+                preload="metadata"
+                ref={(el) => {
+                  if (el) videoRefs.current[idx] = el;
+                }}
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </SwiperSlide>
           ))}
         </Swiper>
+        {autoplayBlocked && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center">
+            <button
+              onClick={handleUserPlay}
+              className="px-6 py-3 rounded-full bg-amber-600 text-white shadow-lg active:scale-95 transition-transform"
+            >
+              Reproducir fondo
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -203,7 +260,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/contacto')}
-              className="w-full sm:w-auto px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-amber-500/30 transition-all duration-300 flex items-center justify-center space-x-2 text-lg"
+              className="w-full sm:w-[280px] h-12 md:h-14 px-6 md:px-8 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-amber-500/30 transition-all duration-300 flex items-center justify-center space-x-2 text-base md:text-lg"
             >
               <span>Solicita Presupuesto</span>
               <Calculator className="w-5 h-5" />
@@ -213,7 +270,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ kpis }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/servicios#editor-ia')}
-              className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-md text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center justify-center space-x-2 text-lg"
+              className="w-full sm:w-[280px] h-12 md:h-14 px-6 md:px-8 bg-white/10 backdrop-blur-md text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center justify-center space-x-2 text-base md:text-lg"
             >
               <span>Rediseña tu espacio</span>
               <Play className="w-5 h-5" />

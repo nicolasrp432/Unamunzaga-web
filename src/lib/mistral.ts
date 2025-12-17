@@ -3,7 +3,14 @@ export type ChatMessage = {
   content: string;
 };
 
+export function isChatAvailable(): boolean {
+  return import.meta.env.DEV;
+}
+
 export async function askMistral(messages: ChatMessage[], opts?: { signal?: AbortSignal }): Promise<string> {
+  if (!isChatAvailable()) {
+    throw new Error('chat_unavailable_in_prod');
+  }
   const res = await fetch('/api/mistral-chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -21,28 +21,28 @@ interface CarouselItem {
 const CAROUSEL_DATA: CarouselItem[] = [
     {
         id: '1',
-        image: 'https://images.unsplash.com/photo-1600607686527-6fb886090705?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Living room with brick wall similar
+        image: '/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_12_centro-de-Bilbao-EL-CANO-1.jpg',
         title: 'UNA VIVIENDA DE REVISTA EN EL CORAZÓN DE BILBAO',
         description: 'Hemos reformado ésta vivienda en pleno corazón de Bilbao y su resultado ha sido de interés para una de las revistas más importantes del país.',
         link: '/portfolio'
     },
     {
         id: '2',
-        image: 'https://images.unsplash.com/photo-1584622050111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Bathroom
+        image: '/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_17_centro-de-Bilbao-EL-CANO-3.jpg',
         title: 'REMODELACIÓN DE VIVIENDA EN EL CENTRO DE BILBAO',
         description: 'Una reforma sutil y conservadora, manteniendo la esencia de la vivienda a petición de sus dueños con toques modernos y minimalistas.',
         link: '/portfolio'
     },
     {
         id: '3',
-        image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Kitchen with terrazzo similar
+        image: '/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_10_casco-viejo-ITURRIBIDE-7.jpg',
         title: 'VIVIENDA EN CASCO VIEJO DE BILBAO',
         description: 'Reforma de una vivienda en el Casco Viejo de Bilbao, usando tonos suaves logrados a partir de la combinación de materiales y elementos que en conjunto forman una maravillosa armonía.',
         link: '/portfolio'
     },
     {
         id: '4',
-        image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Modern interior
+        image: '/Proyectos – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_146_viviendas-7.jpg',
         title: 'DISEÑO CONTEMPORÁNEO EN INDAUTXU',
         description: 'Transformación integral priorizando la luz natural y los espacios abiertos, creando un hogar funcional y estéticamente impecable.',
         link: '/portfolio'

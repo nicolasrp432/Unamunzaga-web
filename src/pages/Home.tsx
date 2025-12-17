@@ -1,15 +1,21 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import './Home.css';
 import { ModernNavbar } from '../components/layout/ModernNavbar';
 import { HeroSection } from '../components/sections/HeroSection';
 import { PortfolioSection } from '../components/sections/PortfolioSection';
-import { TestimonialsSection } from '../components/sections/TestimonialsSection';
-import { CTASection } from '../components/sections/CTASection';
-import { ServicesPreview } from '../components/sections/ServicesPreview';
-import { LatestPostsCarousel } from '../components/sections/LatestPostsCarousel';
-import ClientTrust from '../components/sections/ClientTrust';
+const TestimonialsSection = lazy(() =>
+  import('../components/sections/TestimonialsSection').then((m) => ({ default: m.TestimonialsSection }))
+);
+const ServicesPreview = lazy(() =>
+  import('../components/sections/ServicesPreview').then((m) => ({ default: m.ServicesPreview }))
+);
+const LatestPostsCarousel = lazy(() =>
+  import('../components/sections/LatestPostsCarousel').then((m) => ({ default: m.LatestPostsCarousel }))
+);
+const ClientTrust = lazy(() => import('../components/sections/ClientTrust'));
 import ModernFooter from '../components/layout/ModernFooter';
+import { CTASection } from '../components/sections/CTASection';
 import FloatingWhatsApp from '../components/ui/FloatingWhatsApp';
 import SEOHead from '../components/layout/SEOHead';
 import { Link } from 'react-router-dom';
@@ -31,11 +37,19 @@ const Home: React.FC = () => {
         <main>
           <HeroSection kpis={mockKPIs} />
           <PortfolioSection projects={projects} />
-          <ServicesPreview />
-          <TestimonialsSection testimonials={testimonials} loading={testimonialsLoading} />
+          <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando servicios...</div>}>
+            <ServicesPreview />
+          </Suspense>
+          <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando testimonios...</div>}>
+            <TestimonialsSection testimonials={testimonials} loading={testimonialsLoading} />
+          </Suspense>
           <CTASection />
-          <LatestPostsCarousel />
-          <ClientTrust />
+          <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando últimas publicaciones...</div>}>
+            <LatestPostsCarousel />
+          </Suspense>
+          <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando confianza de clientes...</div>}>
+            <ClientTrust />
+          </Suspense>
         </main>
         <ModernFooter />
         <FloatingWhatsApp />
