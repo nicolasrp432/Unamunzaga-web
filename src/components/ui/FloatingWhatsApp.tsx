@@ -223,7 +223,7 @@ const FloatingWhatsApp: React.FC = () => {
                         key={idx}
                         className={
                           m.role === 'assistant'
-                            ? 'max-w-[85%] rounded-2xl px-4 py-3 bg-white shadow text-gray-900'
+                            ? 'max-w-[85%] rounded-2xl px-4 py-3 bg-slate-800 shadow text-white'
                             : 'max-w-[85%] rounded-2xl px-4 py-3 bg-blue-600 text-white ml-auto'
                         }
                       >
@@ -231,7 +231,7 @@ const FloatingWhatsApp: React.FC = () => {
                       </div>
                     ))}
                     {sending && (
-                      <div className="max-w-[60%] rounded-2xl px-4 py-3 bg-white shadow text-gray-900">
+                      <div className="max-w-[60%] rounded-2xl px-4 py-3 bg-slate-800 shadow text-white">
                         Escribiendo...
                       </div>
                     )}
