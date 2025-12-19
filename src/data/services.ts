@@ -1,4 +1,4 @@
-import { Building2, Wrench, Bath, Store, Building, Zap, Waves, BadgeCheck, Sparkles } from 'lucide-react';
+import { Building2, Wrench, Bath, Store, Building, Zap, Waves, BadgeCheck, Sparkles, PaintRoller, Ruler, Trash2, Layers } from 'lucide-react';
 
 export type ServiceItem = {
   id: string;
@@ -93,7 +93,7 @@ export const servicesData: ServiceItem[] = [
       'Oficinas'
     ],
     image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_6_5-2.jpg',
-    icon: Wrench,
+    icon: PaintRoller,
     badges: ['Servicio integral']
   },
   {
@@ -205,7 +205,7 @@ export const servicesData: ServiceItem[] = [
       'Decoración'
     ],
     image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_13_12.jpg',
-    icon: Wrench,
+    icon: Layers,
     badges: ['Versatilidad']
   },
   {
@@ -253,7 +253,7 @@ export const servicesData: ServiceItem[] = [
       'Transporte a vertedero'
     ],
     image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_16_15.jpg',
-    icon: Wrench,
+    icon: Trash2,
     badges: ['Gestión responsable']
   },
   {
@@ -269,7 +269,7 @@ export const servicesData: ServiceItem[] = [
       'Escaleras'
     ],
     image: '/Servicios – Unamunzaga Obras _ Empresa de Reformas en Bilbao/imgi_2_1-2.jpg',
-    icon: Wrench,
+    icon: Ruler,
     badges: ['A medida']
   },
   {

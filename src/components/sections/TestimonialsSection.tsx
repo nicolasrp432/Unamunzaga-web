@@ -1,22 +1,123 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Testimonial } from '../../types';
-import { Star, ChevronLeft, ChevronRight, Quote, Loader2 } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Quote, Loader2, Edit, Trash2, Plus, Save, X, Upload, Image as ImageIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { supabase } from '../../lib/supabase';
+
+// DB Type definition matching the Supabase table
+interface DBTestimonial {
+  id: string;
+  client_name: string;
+  role: string | null;
+  testimonial_text: string;
+  image_url: string | null;
+  created_at: string;
+  company?: string | null;
+  project_id?: string | null;
+  rating?: number | null;
+}
 
 interface TestimonialsSectionProps {
-  testimonials: Testimonial[];
+  testimonials?: Testimonial[]; // Made optional as we might fetch internally
   loading?: boolean;
   error?: string | null;
 }
 
-export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials, loading, error }) => {
+export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials: initialTestimonials = [], loading: initialLoading, error: initialError }) => {
+  // State for display
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
+  const [isLoading, setIsLoading] = useState(initialLoading || false);
+  const [fetchError, setFetchError] = useState<string | null>(initialError || null);
+  
+  // Slider State
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [direction, setDirection] = useState(0); // 0: next, 1: prev
 
+  // Admin/Edit State
+  const [isAdminMode, setIsAdminMode] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [operationLoading, setOperationLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  
+  // Form State
+  const initialFormState = {
+    client_name: '',
+    role: '',
+    testimonial_text: '',
+    company: '',
+    rating: 5,
+    image_url: ''
+  };
+  const [formData, setFormData] = useState(initialFormState);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch testimonials from Supabase
+  const fetchTestimonials = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (data) {
+        // Map DB fields to UI Testimonial type
+        const mappedTestimonials: Testimonial[] = data.map((item: DBTestimonial) => ({
+          id: item.id,
+          client_name: item.client_name,
+          role: item.role || '',
+          testimonial_text: item.testimonial_text,
+          avatar_url: item.image_url || undefined,
+          company: item.company || undefined,
+          project: undefined, // Project mapping would require join or separate fetch if using project_id
+          rating: item.rating || 5,
+          created_at: item.created_at
+        }));
+        setTestimonials(mappedTestimonials);
+      }
+    } catch (err: any) {
+      console.error('Error fetching testimonials:', err);
+      setFetchError(err.message);
+      if (initialTestimonials.length > 0) setTestimonials(initialTestimonials);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!isAutoPlaying || loading || error || testimonials.length === 0) return;
+    // Initial fetch
+    fetchTestimonials();
+
+    // Real-time subscription
+    const channel = supabase
+      .channel('testimonials-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'testimonials'
+        },
+        (payload) => {
+          console.log('Real-time change received for testimonials:', payload);
+          fetchTestimonials();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  // Slider Logic
+  useEffect(() => {
+    if (!isAutoPlaying || isLoading || fetchError || testimonials.length === 0 || isAdminMode) return;
 
     const interval = setInterval(() => {
       setDirection(0);
@@ -24,7 +125,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, testimonials.length, loading, error]);
+  }, [isAutoPlaying, testimonials.length, isLoading, fetchError, isAdminMode]);
 
   const nextTestimonial = () => {
     setDirection(0);
@@ -42,6 +143,133 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
     setDirection(index > currentIndex ? 0 : 1);
     setCurrentIndex(index);
     setIsAutoPlaying(false);
+  };
+
+  // CRUD Operations
+  const handleEdit = (testimonial: Testimonial) => {
+    setFormData({
+      client_name: testimonial.client_name,
+      role: testimonial.role || '',
+      testimonial_text: testimonial.testimonial_text,
+      company: testimonial.company || '',
+      rating: testimonial.rating,
+      image_url: testimonial.avatar_url || ''
+    });
+    setEditingId(testimonial.id);
+    setIsEditing(true);
+    setIsAutoPlaying(false);
+  };
+
+  const handleAddNew = () => {
+    setFormData(initialFormState);
+    setEditingId(null);
+    setIsEditing(true);
+    setIsAutoPlaying(false);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditingId(null);
+    setFormData(initialFormState);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    setUploadingImage(true);
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('testimonials')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('testimonials')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, image_url: publicUrl }));
+    } catch (error: any) {
+      alert(`Error uploading image: ${error.message}`);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.client_name || !formData.testimonial_text) {
+      alert('Nombre y contenido son obligatorios');
+      return;
+    }
+
+    setOperationLoading(true);
+    try {
+      const testimonialData = {
+        client_name: formData.client_name,
+        role: formData.role,
+        testimonial_text: formData.testimonial_text,
+        company: formData.company,
+        rating: formData.rating,
+        image_url: formData.image_url,
+      };
+
+      if (editingId) {
+        // Update
+        const { error } = await supabase
+          .from('testimonials')
+          .update(testimonialData)
+          .eq('id', editingId);
+        
+        if (error) throw error;
+      } else {
+        // Create
+        const { error } = await supabase
+          .from('testimonials')
+          .insert([testimonialData]);
+        
+        if (error) throw error;
+      }
+
+      await fetchTestimonials();
+      handleCancel();
+    } catch (error: any) {
+      console.error('Error saving testimonial:', error);
+      alert(`Error al guardar: ${error.message}`);
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este testimonio?')) return;
+
+    setOperationLoading(true);
+    try {
+      const { error } = await supabase
+        .from('testimonials')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      // Adjust current index if needed
+      if (currentIndex >= testimonials.length - 1) {
+        setCurrentIndex(Math.max(0, testimonials.length - 2));
+      }
+      
+      await fetchTestimonials();
+    } catch (error: any) {
+      console.error('Error deleting testimonial:', error);
+      alert(`Error al eliminar: ${error.message}`);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const slideVariants = {
@@ -66,7 +294,8 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
     return Math.abs(offset) * velocity;
   };
 
-  if (loading) {
+  // Render Logic
+  if (isLoading && testimonials.length === 0) {
     return (
       <section id="testimonials" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -81,14 +310,19 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
     );
   }
 
-  if (error || testimonials.length === 0) {
-    // Don't render section if error or no content, or render placeholder
-    // For now, render nothing to avoid broken UI
-    return null;
-  }
-
   return (
-    <section id="testimonials" className="py-20 bg-white">
+    <section id="testimonials" className="py-20 bg-white relative">
+      {/* Admin Toggle - Hidden or discrete */}
+      <div className="absolute top-4 right-4 z-50 opacity-20 hover:opacity-100 transition-opacity">
+        <button
+          onClick={() => setIsAdminMode(!isAdminMode)}
+          className="p-2 bg-gray-800 text-white rounded-full"
+          title="Modo Admin"
+        >
+          <Edit size={16} />
+        </button>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -105,9 +339,171 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
           </p>
         </motion.div>
 
+        {/* Admin Interface */}
+        {isAdminMode && (
+          <div className="mb-12 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-800">Gestión de Testimonios</h3>
+              <button
+                onClick={handleAddNew}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors"
+              >
+                <Plus size={20} />
+                <span>Nuevo Testimonio</span>
+              </button>
+            </div>
+
+            {isEditing && (
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md mb-8 border border-gray-100">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                  <input
+                    type="text"
+                    value={formData.client_name}
+                    onChange={e => setFormData({ ...formData, client_name: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Rol / Cargo</label>
+                  <input
+                    type="text"
+                    value={formData.role}
+                    onChange={e => setFormData({ ...formData, role: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
+                  <input
+                    type="text"
+                    value={formData.company}
+                    onChange={e => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Testimonio *</label>
+                  <textarea
+                    value={formData.testimonial_text}
+                    onChange={e => setFormData({ ...formData, testimonial_text: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 h-32"
+                    required
+                  />
+                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Puntuación (1-5)</label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="range"
+                        min="1"
+                        max="5"
+                        value={formData.rating}
+                        onChange={e => setFormData({ ...formData, rating: parseInt(e.target.value) })}
+                        className="w-full"
+                      />
+                      <span className="font-bold text-lg">{formData.rating}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Imagen</label>
+                    <div className="flex items-center space-x-4">
+                      {formData.image_url && (
+                        <img src={formData.image_url} alt="Preview" className="w-12 h-12 rounded-full object-cover" />
+                      )}
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingImage}
+                        className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
+                      >
+                        {uploadingImage ? <Loader2 className="animate-spin w-4 h-4" /> : <Upload className="w-4 h-4" />}
+                        <span>{uploadingImage ? 'Subiendo...' : 'Subir Imagen'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={operationLoading}
+                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 flex items-center space-x-2"
+                  >
+                    {operationLoading && <Loader2 className="animate-spin w-4 h-4" />}
+                    <span>{editingId ? 'Actualizar' : 'Guardar'}</span>
+                  </button>
+                </div>
+              </form>
+            )}
+
+            <div className="bg-white rounded-xl shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Testimonio</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {testimonials.map((t) => (
+                    <tr key={t.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            {t.avatar_url ? (
+                              <img className="h-10 w-10 rounded-full object-cover" src={t.avatar_url} alt="" />
+                            ) : (
+                              <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                <span className="text-gray-500 font-bold">{t.client_name.charAt(0)}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{t.client_name}</div>
+                            <div className="text-sm text-gray-500">{t.role}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900 max-w-xs truncate">{t.testimonial_text}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onClick={() => handleEdit(t)} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                          <Edit size={18} />
+                        </button>
+                        <button onClick={() => handleDelete(t.id)} className="text-red-600 hover:text-red-900">
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Testimonials Slider */}
+        {testimonials.length > 0 ? (
         <div className="relative max-w-4xl mx-auto">
-          <div className="relative h-[400px] overflow-hidden">
+          <div className="relative min-h-[600px] flex items-center">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={currentIndex}
@@ -132,24 +528,34 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
                     prevTestimonial();
                   }
                 }}
-                className="absolute inset-0 flex items-center justify-center"
+                className="absolute inset-0 flex items-center justify-center w-full"
               >
-                <div className="bg-gray-50 rounded-2xl p-8 md:p-12 text-center max-w-2xl mx-auto">
-                  {/* Quote Icon */}
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="mb-6"
+                <div className="bg-gray-50 rounded-2xl p-8 md:p-12 text-center w-full mx-auto shadow-sm">
+                  {/* Client Image - Top Center */}
+                  <motion.div 
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="mb-6 flex justify-center"
                   >
-                    <Quote className="w-12 h-12 text-blue-900 mx-auto" />
+                    {testimonials[currentIndex].avatar_url ? (
+                      <img
+                        src={testimonials[currentIndex].avatar_url}
+                        alt={testimonials[currentIndex].client_name}
+                        className="w-[150px] h-[150px] rounded-full object-cover border-4 border-white shadow-lg"
+                      />
+                    ) : (
+                      <div className="w-[150px] h-[150px] rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-lg">
+                         <span className="text-4xl text-gray-400 font-bold">{testimonials[currentIndex].client_name.charAt(0)}</span>
+                      </div>
+                    )}
                   </motion.div>
 
                   {/* Rating */}
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
                     className="flex justify-center space-x-1 mb-6"
                   >
                     {[...Array(5)].map((_, i) => (
@@ -166,44 +572,35 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
                   </motion.div>
 
                   {/* Testimonial Text */}
-                  <motion.p
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8 italic"
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="mb-8"
                   >
-                    "{testimonials[currentIndex].testimonial_text}"
-                  </motion.p>
+                     <Quote className="w-8 h-8 text-blue-900/20 mx-auto mb-4" />
+                     <p className="text-lg text-gray-700 leading-relaxed whitespace-pre-line">
+                      "{testimonials[currentIndex].testimonial_text}"
+                     </p>
+                  </motion.div>
 
                   {/* Client Info */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                    className="flex items-center justify-center space-x-4"
+                    transition={{ duration: 0.6, delay: 0.4 }}
                   >
-                    {testimonials[currentIndex].avatar_url && (
-                      <img
-                        src={testimonials[currentIndex].avatar_url}
-                        alt={testimonials[currentIndex].client_name}
-                        className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-lg"
-                      />
-                    )}
-                    <div className="text-left">
-                      <h4 className="font-bold text-gray-900 text-lg">
-                        {testimonials[currentIndex].client_name}
-                      </h4>
+                    <h4 className="font-bold text-gray-900 text-xl mb-1">
+                      {testimonials[currentIndex].client_name}
+                    </h4>
+                    <p className="text-gray-600 font-medium">
+                      {testimonials[currentIndex].role}
                       {testimonials[currentIndex].company && (
-                        <p className="text-gray-600">
+                        <span className="block text-sm text-gray-500 mt-1">
                           {testimonials[currentIndex].company}
-                        </p>
+                        </span>
                       )}
-                      {testimonials[currentIndex].project && (
-                        <p className="text-sm text-blue-900 font-medium">
-                          Proyecto: {testimonials[currentIndex].project}
-                        </p>
-                      )}
-                    </div>
+                    </p>
                   </motion.div>
                 </div>
               </motion.div>
@@ -228,8 +625,22 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
             <ChevronRight className="w-6 h-6 text-gray-700" />
           </button>
         </div>
+        ) : (
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <p className="text-gray-500">No hay testimonios disponibles.</p>
+            {isAdminMode && (
+              <button
+                onClick={handleAddNew}
+                className="mt-4 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+              >
+                Añadir el primero
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Dots Indicator */}
+        {testimonials.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -251,8 +662,10 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
             />
           ))}
         </motion.div>
+        )}
 
         {/* Auto-play Toggle */}
+        {testimonials.length > 0 && !isAdminMode && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -271,6 +684,8 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
             {isAutoPlaying ? 'Pausar reproducción' : 'Reproducir automáticamente'}
           </button>
         </motion.div>
+        )}
+
 
         {/* Company Logos */}
         <motion.div

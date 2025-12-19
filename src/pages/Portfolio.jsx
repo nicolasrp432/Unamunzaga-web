@@ -4,59 +4,24 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProjectCard from '../components/portfolio/ProjectCard';
 import KuulaTour from '../components/kuula/KuulaTour';
+import { useProjects } from '../hooks/useProjects';
 import './Portfolio.css';
 
-const projects = [
-    {
-        id: 1,
-        title: 'Reforma Integral en Casco Viejo',
-        category: 'viviendas',
-        location: 'Bilbao',
-        image: 'https://unamunzagaobras.com/home/wp-content/uploads/2020/12/casco-viejo-ITURRIBIDE-7.jpg'
-    },
-    {
-        id: 2,
-        title: 'Rehabilitación El Cano',
-        category: 'viviendas',
-        location: 'Bilbao Centro',
-        image: 'https://unamunzagaobras.com/home/wp-content/uploads/2020/12/centro-de-Bilbao-EL-CANO-12.jpg'
-    },
-    {
-        id: 3,
-        title: 'Proyecto Iturrizar',
-        category: 'viviendas',
-        location: 'Bilbao',
-        image: 'https://unamunzagaobras.com/home/wp-content/uploads/2020/12/centro-de-Bilbao-ITURRIZAR-2.jpg'
-    },
-    {
-        id: 4,
-        title: 'Local Comercial Moderno',
-        category: 'locales',
-        location: 'Getxo',
-        image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=800&auto=format&fit=crop'
-    },
-    {
-        id: 5,
-        title: 'Rehabilitación de Fachada',
-        category: 'fachadas',
-        location: 'Indautxu',
-        image: 'https://images.unsplash.com/photo-1517581177697-0005ec4a6190?q=80&w=800&auto=format&fit=crop'
-    },
-    {
-        id: 6,
-        title: 'Oficinas Corporativas',
-        category: 'locales',
-        location: 'Bilbao',
-        image: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=800&auto=format&fit=crop'
-    }
-];
-
 const Portfolio = () => {
+    const { projects, loading } = useProjects();
     const [filter, setFilter] = useState('all');
 
+    const mappedProjects = projects.map(p => ({
+        id: p.id,
+        title: p.title,
+        category: p.category || 'viviendas', // default category
+        location: p.location || '',
+        image: p.images && p.images.length > 0 ? p.images[0] : ''
+    }));
+
     const filteredProjects = filter === 'all'
-        ? projects
-        : projects.filter(project => project.category === filter);
+        ? mappedProjects
+        : mappedProjects.filter(project => project.category === filter);
 
     return (
         <>
@@ -83,13 +48,19 @@ const Portfolio = () => {
                         ))}
                     </div>
 
-                    <motion.div layout className="projects-grid">
-                        <AnimatePresence>
-                            {filteredProjects.map(project => (
-                                <ProjectCard key={project.id} project={project} />
-                            ))}
-                        </AnimatePresence>
-                    </motion.div>
+                    {loading ? (
+                        <div className="text-center py-12">
+                            <div className="loader">Cargando proyectos...</div>
+                        </div>
+                    ) : (
+                        <motion.div layout className="projects-grid">
+                            <AnimatePresence>
+                                {filteredProjects.map(project => (
+                                    <ProjectCard key={project.id} project={project} />
+                                ))}
+                            </AnimatePresence>
+                        </motion.div>
+                    )}
                 </div>
             </section>
 

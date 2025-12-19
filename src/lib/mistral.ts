@@ -8,9 +8,11 @@ export function isChatAvailable(): boolean {
 }
 
 export async function askMistral(messages: ChatMessage[], opts?: { signal?: AbortSignal }): Promise<string> {
-  if (!isChatAvailable()) {
-    throw new Error('chat_unavailable_in_prod');
-  }
+  // We allow API calls in production now, assuming the /api endpoint exists (e.g. Vercel functions)
+  // if (!isChatAvailable()) {
+  //   throw new Error('chat_unavailable_in_prod');
+  // }
+  
   const res = await fetch('/api/mistral-chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

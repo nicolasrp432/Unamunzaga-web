@@ -26,10 +26,12 @@ export function useServices() {
     useEffect(() => {
         async function fetchServices() {
             try {
+                // Temporarily using created_at as default sort to avoid 400 errors until DB schema is updated
+                // Switch back to 'display_order' after running the FIX_SCHEMA_ERRORS.sql script
                 const { data, error } = await supabase
                     .from('services')
                     .select('*')
-                    .order('title');
+                    .order('created_at', { ascending: true });
 
                 if (error) {
                     throw error;
@@ -46,6 +48,27 @@ export function useServices() {
         }
 
         fetchServices();
+
+        // Real-time subscription
+        const channel = supabase
+            .channel('services-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'services'
+                },
+                (payload) => {
+                    console.log('Real-time change received for services:', payload);
+                    fetchServices();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     return { services, loading, error };

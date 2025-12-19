@@ -33,8 +33,15 @@ export const useJobPositions = () => {
                     setPositions(data);
                 }
             } catch (err: any) {
-                console.error('Error fetching job positions:', err);
-                setError(err.message);
+                // Check for missing table error (PGRST205)
+                if (err.code === 'PGRST205' || err.message?.includes('job_positions')) {
+                    console.warn('⚠️ Table "job_positions" missing. Please run "src/scripts/update_schema_jobs.sql" in Supabase.');
+                    setPositions([]); // Return empty list so UI works
+                    // Don't set error state to avoid scary UI messages for missing optional feature
+                } else {
+                    console.error('Error fetching job positions:', err);
+                    setError(err.message);
+                }
             } finally {
                 setLoading(false);
             }

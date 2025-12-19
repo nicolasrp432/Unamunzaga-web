@@ -1,108 +1,135 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { Calendar, CheckCircle, Clock } from 'lucide-react';
+import { Users, Briefcase, MessageSquare, Image, Activity } from 'lucide-react';
 
 const Overview = () => {
     const { user } = useAuth();
-    const [project, setProject] = useState(null);
-    const [updates, setUpdates] = useState([]);
+    const [stats, setStats] = useState({
+        team: 0,
+        services: 0,
+        testimonials: 0,
+        projects: 0
+    });
+    const [activities, setActivities] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchProjectData = async () => {
+        const fetchData = async () => {
             if (!user) return;
+            setLoading(true);
 
             try {
-                // Fetch project associated with user
-                const { data: projectData, error: projectError } = await supabase
-                    .from('projects')
+                // Fetch counts (parallel)
+                const [
+                    { count: teamCount },
+                    { count: servicesCount },
+                    { count: testimonialsCount },
+                    { count: projectsCount }
+                ] = await Promise.all([
+                    supabase.from('team_members').select('*', { count: 'exact', head: true }),
+                    supabase.from('services').select('*', { count: 'exact', head: true }),
+                    supabase.from('testimonials').select('*', { count: 'exact', head: true }),
+                    supabase.from('featured_projects').select('*', { count: 'exact', head: true })
+                ]);
+
+                setStats({
+                    team: teamCount || 0,
+                    services: servicesCount || 0,
+                    testimonials: testimonialsCount || 0,
+                    projects: projectsCount || 0
+                });
+
+                // Fetch recent activity
+                const { data: activityData } = await supabase
+                    .from('activity_logs')
                     .select('*')
-                    .eq('client_id', user.id)
-                    .single();
+                    .order('created_at', { ascending: false })
+                    .limit(5);
 
-                if (projectError && projectError.code !== 'PGRST116') throw projectError;
+                setActivities(activityData || []);
 
-                if (projectData) {
-                    setProject(projectData);
-
-                    // Fetch updates for the project
-                    const { data: updatesData, error: updatesError } = await supabase
-                        .from('project_updates')
-                        .select('*')
-                        .eq('project_id', projectData.id)
-                        .order('date', { ascending: false });
-
-                    if (updatesError) throw updatesError;
-                    setUpdates(updatesData);
-                }
             } catch (error) {
-                console.error('Error fetching dashboard data:', error);
+                console.error('Error fetching admin stats:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProjectData();
+        fetchData();
     }, [user]);
 
-    if (loading) return <div>Cargando datos del proyecto...</div>;
-
-    if (!project) {
-        return (
-            <div className="dashboard-container">
-                <div className="dashboard-header">
-                    <h1>Bienvenido, {user?.email}</h1>
-                </div>
-                <div className="empty-state">
-                    <p>No tienes ningún proyecto activo asignado actualmente.</p>
-                    <p>Si crees que es un error, contacta con nosotros.</p>
-                </div>
-            </div>
-        );
-    }
+    if (loading) return <div className="p-8 text-center text-gray-500">Cargando estadísticas...</div>;
 
     return (
         <div className="dashboard-container">
-            <div className="dashboard-header">
-                <h1>{project.title}</h1>
-                <p className="text-muted">Estado: <span className="status-badge">{project.status}</span></p>
+            <div className="dashboard-header mb-8">
+                <h1 className="text-2xl font-bold text-gray-800">Panel de Administración</h1>
+                <p className="text-gray-500">Bienvenido, {user?.user_metadata?.full_name || user?.email}</p>
             </div>
 
-            <div className="stats-grid">
-                <div className="stat-card">
-                    <h3>Inicio</h3>
-                    <div className="value">{project.start_date || 'Pendiente'}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+                        <Users size={24} />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold">{stats.team}</div>
+                        <div className="text-sm text-gray-500">Miembros del Equipo</div>
+                    </div>
                 </div>
-                <div className="stat-card">
-                    <h3>Fin Estimado</h3>
-                    <div className="value">{project.end_date || 'Pendiente'}</div>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div className="p-3 bg-green-100 text-green-600 rounded-full">
+                        <Briefcase size={24} />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold">{stats.services}</div>
+                        <div className="text-sm text-gray-500">Servicios Activos</div>
+                    </div>
                 </div>
-                <div className="stat-card">
-                    <h3>Progreso</h3>
-                    <div className="value">35%</div> {/* Mocked for now */}
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div className="p-3 bg-purple-100 text-purple-600 rounded-full">
+                        <MessageSquare size={24} />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold">{stats.testimonials}</div>
+                        <div className="text-sm text-gray-500">Testimonios</div>
+                    </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div className="p-3 bg-orange-100 text-orange-600 rounded-full">
+                        <Image size={24} />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold">{stats.projects}</div>
+                        <div className="text-sm text-gray-500">Proyectos Destacados</div>
+                    </div>
                 </div>
             </div>
 
-            <div className="timeline-section">
-                <h2>Avance de Obra</h2>
-                <div className="timeline">
-                    {updates.length > 0 ? (
-                        updates.map((update) => (
-                            <div key={update.id} className="timeline-item completed">
-                                <div className="timeline-dot"></div>
-                                <div className="timeline-date">{update.date}</div>
-                                <div className="timeline-content">
-                                    <h4>{update.title}</h4>
-                                    <p>{update.description}</p>
-                                    {update.image_url && (
-                                        <img src={update.image_url} alt="Update" className="update-image" style={{ marginTop: '10px', borderRadius: '4px', maxWidth: '100%' }} />
-                                    )}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <Activity size={20} /> Actividad Reciente
+                </h2>
+                <div className="space-y-4">
+                    {activities.length > 0 ? (
+                        activities.map((log) => (
+                            <div key={log.id} className="flex items-start gap-3 pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+                                <div className="text-xs font-mono text-gray-400 mt-1 whitespace-nowrap">
+                                    {new Date(log.created_at).toLocaleString()}
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-800">
+                                        {log.action} - {log.entity_type}
+                                    </div>
+                                    <div className="text-xs text-gray-500 truncate max-w-md">
+                                        {JSON.stringify(log.details)}
+                                    </div>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <p>No hay actualizaciones recientes.</p>
+                        <p className="text-gray-500 text-sm">No hay actividad reciente registrada.</p>
                     )}
                 </div>
             </div>

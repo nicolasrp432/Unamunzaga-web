@@ -11,6 +11,12 @@ const Documents = () => {
     useEffect(() => {
         const fetchDocuments = async () => {
             if (!user) return;
+            
+            // Skip fetch for guest admin to avoid 400 error (UUID mismatch)
+            if (user.id === 'guest-admin') {
+                setLoading(false);
+                return;
+            }
 
             try {
                 // First get project id

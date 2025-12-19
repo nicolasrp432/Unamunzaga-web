@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconBrandWhatsapp } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconX, IconMessageChatbot, IconMail, IconSend } from '@tabler/icons-react';
+import ReactMarkdown from 'react-markdown';
 import { askMistral } from '../../lib/mistral';
 import { useProjects } from '../../hooks/useProjects';
 import { useServices } from '../../hooks/useServices';
@@ -23,12 +24,12 @@ const FloatingWhatsApp: React.FC = () => {
   const { services } = useServices();
 
   const systemPrompt =
-    'Eres el asistente virtual de Unamunzaga Obras, empresa de reformas y construcción en Bilbao (Bizkaia). Ofreces: reforma integral, cocina, baño, locales comerciales, obra nueva y otros. Respondes en menos de 24 horas, con asesoría gratuita y presupuestos transparentes. Si el usuario pide contacto, ofrece: Teléfono +34 944 07 84 27, +34 674 27 44 66, +34 629 11 65 15, Email contacto@unamunzagaobras.com, Dirección Calle Licenciado Poza 30, 48011 Bilbao. Contesta siempre en español, de forma clara, breve y profesional, y pregunta lo necesario para preparar un presupuesto.';
+    'Eres el asistente virtual de Unamunzaga Obras, empresa de reformas y construcción en Bilbao (Bizkaia). Ofreces: reforma integral, cocina, baño, locales comerciales, obra nueva y otros. Respondes en menos de 24 horas, con asesoría gratuita y presupuestos transparentes. Si el usuario pide contacto, ofrece: Teléfono +34 944 07 84 27, +34 674 27 44 66, +34 629 11 65 15, Email contacto@unamunzagaobras.com, Dirección Calle Licenciado Poza 30, 48011 Bilbao. Contesta siempre en español, de forma clara, breve y profesional, y pregunta lo necesario para preparar un presupuesto. Puedes usar formato Markdown para estructurar tu respuesta (listas, negritas, encabezados).';
 
   const buildSiteContext = () => {
     try {
       const servicesNames = services.map((s) => s.title).filter(Boolean);
-      const featured = projects.filter((p) => p.featured);
+      const featured = projects.filter((p) => p.is_featured);
       const featuredSummary = featured
         .slice(0, 3)
         .map((p) => `${p.title} (${p.location})`)
@@ -49,12 +50,13 @@ const FloatingWhatsApp: React.FC = () => {
 
   const openChatbot = () => {
     setChatbotOpen(true);
+    setShowMenu(false);
     if (messages.length === 0) {
       setMessages([
         {
           role: 'assistant',
           content:
-            'Hola, soy el asistente virtual de Unamunzaga Obras. ¿En qué podemos ayudarte con tu reforma o construcción?',
+            'Hola, soy el asistente virtual de Unamunzaga Obras. **¿En qué podemos ayudarte con tu reforma o construcción?**',
         },
       ]);
     }
@@ -73,29 +75,17 @@ const FloatingWhatsApp: React.FC = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     try {
-      if (import.meta.env.PROD) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content:
-              'El chatbot no está disponible en producción sin backend configurado. Configura MISTRAL_API_KEY y un endpoint seguro.',
-          },
-        ]);
-        return;
-      }
+      // Production check removed to allow API calls if endpoint exists
       const ping = await fetch('/api/mistral-ping').catch(() => null);
+      // We still check if the ping works, but we don't block just based on environment
       if (!ping || !ping.ok) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content:
-              'Error de configuración: falta MISTRAL_API_KEY o el proxy no está operativo. Revisa las variables de entorno.',
-          },
-        ]);
-        return;
+         // Fallback logic or error if API is truly missing
+         // However, for now we will proceed to try the chat call, 
+         // but if ping failed, chat likely will too.
+         // Let's log it but try anyway or show error if we are sure.
+         console.warn("API Ping failed, backend might be unavailable");
       }
+      
       controllerRef.current?.abort();
       controllerRef.current = new AbortController();
       const history = messages.filter((m) => m.role !== 'system').slice(-6);
@@ -104,10 +94,11 @@ const FloatingWhatsApp: React.FC = () => {
         { signal: controllerRef.current.signal }
       );
       setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Ha ocurrido un error al responder. Inténtalo de nuevo más tarde.' },
+        { role: 'assistant', content: 'Ha ocurrido un error al responder. Por favor, contáctanos por WhatsApp o email.' },
       ]);
     } finally {
       setSending(false);
@@ -128,41 +119,36 @@ const FloatingWhatsApp: React.FC = () => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed bottom-6 right-6 z-50"
+          className="fixed bottom-6 right-6 z-50 font-sans"
         >
           <AnimatePresence>
-            {showMenu && (
+            {showMenu && !chatbotOpen && (
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 16 }}
                 transition={{ duration: 0.2 }}
-                className="absolute bottom-20 right-0 bg-slate-900 text-white rounded-lg shadow-2xl p-3 w-64"
+                className="absolute bottom-20 right-0 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-xl shadow-2xl p-4 w-72 border border-slate-200 dark:border-slate-800"
               >
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <button
                     onClick={handleWhatsAppClick}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 flex items-center justify-center"
+                    className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-lg px-4 py-3 text-sm font-bold transition-all duration-200 flex items-center justify-center shadow-sm"
                   >
-                    <IconBrandWhatsapp className="mr-2" size={16} /> WhatsApp
+                    <IconBrandWhatsapp className="mr-2" size={20} /> Contactar por WhatsApp
                   </button>
                   <button
                     onClick={() => navigate('/contacto')}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-3 text-sm font-bold transition-all duration-200 flex items-center justify-center shadow-sm"
                   >
-                    Solicitar presupuesto
+                    <IconMail className="mr-2" size={20} /> Solicitar presupuesto
                   </button>
-                  <button
-                    onClick={handleWhatsAppClick}
-                    className="w-full bg-slate-600 hover:bg-slate-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
-                  >
-                    Consultar disponibilidad
-                  </button>
+                  {/* 'Consultar disponibilidad' button removed */}
                   <button
                     onClick={openChatbot}
-                    className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-4 py-3 text-sm font-bold transition-all duration-200 flex items-center justify-center shadow-sm"
                   >
-                    Hablar con chatbot
+                    <IconMessageChatbot className="mr-2" size={20} /> Asistente IA
                   </button>
                 </div>
               </motion.div>
@@ -170,110 +156,136 @@ const FloatingWhatsApp: React.FC = () => {
           </AnimatePresence>
 
           {/* Floating Button */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="bg-green-600 hover:bg-green-700 text-white rounded-full p-4 shadow-lg transition-all duration-300 flex items-center justify-center"
-            aria-label="Abrir chat de WhatsApp"
-            onClick={() => setShowMenu((v) => !v)}
-          >
-            <div className="relative">
-              <IconBrandWhatsapp size={24} />
-              <motion.span
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"
-              />
-            </div>
-          </motion.button>
-
-          {!showMenu && (
-            <motion.div
-              animate={{ scale: [1, 1.5, 1], opacity: [0.7, 0, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inset-0 bg-green-600 rounded-full"
-              style={{ zIndex: -1 }}
-            />
+          {!chatbotOpen && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full p-4 shadow-xl transition-all duration-300 flex items-center justify-center"
+              aria-label="Abrir opciones de contacto"
+              onClick={() => setShowMenu((v) => !v)}
+            >
+              <div className="relative">
+                <IconBrandWhatsapp size={32} stroke={1.5} />
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full"
+                />
+              </div>
+            </motion.button>
           )}
+
           <AnimatePresence>
             {chatbotOpen && (
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className="absolute bottom-24 right-0 w-[360px] max-w-[90vw] bg-white rounded-2xl shadow-2xl p-4"
+                className="absolute bottom-0 right-0 w-[380px] max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col h-[500px] max-h-[80vh]"
               >
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">Asistente Virtual</h3>
-                    <p className="text-sm text-gray-600">Asesoría inmediata y presupuestos transparentes.</p>
+                {/* Header */}
+                <div className="bg-slate-50 dark:bg-slate-800 p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                      <IconMessageChatbot className="text-blue-600 dark:text-blue-400" size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">Asistente Virtual</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">En línea ahora</p>
+                    </div>
                   </div>
                   <button
                     onClick={() => setChatbotOpen(false)}
-                    className="px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors"
                   >
-                    Cerrar
+                    <IconX size={20} />
                   </button>
                 </div>
-                <div className="flex flex-col h-96 border border-gray-200 rounded-xl overflow-hidden">
-                  <div ref={messagesRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-                    {messages.map((m, idx) => (
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-slate-950 scroll-smooth" ref={messagesRef}>
+                  {messages.map((m, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex ${m.role === 'assistant' ? 'justify-start' : 'justify-end'}`}
+                    >
                       <div
-                        key={idx}
-                        className={
+                        className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
                           m.role === 'assistant'
-                            ? 'max-w-[85%] rounded-2xl px-4 py-3 bg-slate-800 shadow text-white'
-                            : 'max-w-[85%] rounded-2xl px-4 py-3 bg-blue-600 text-white ml-auto'
-                        }
+                            ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-none'
+                            : 'bg-blue-600 text-white rounded-tr-none'
+                        }`}
                       >
-                        {m.content}
+                        <ReactMarkdown
+                          components={{
+                            p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                            strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+                            ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2" {...props} />,
+                            ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2" {...props} />,
+                            li: ({node, ...props}) => <li className="mb-1" {...props} />,
+                            h1: ({node, ...props}) => <h3 className="font-bold text-lg mb-2" {...props} />,
+                            h2: ({node, ...props}) => <h4 className="font-bold text-base mb-2" {...props} />,
+                            h3: ({node, ...props}) => <h5 className="font-bold text-sm mb-2" {...props} />,
+                            a: ({node, ...props}) => <a className="underline hover:text-blue-200" target="_blank" {...props} />,
+                            code: ({node, ...props}) => <code className="bg-black/10 dark:bg-white/10 rounded px-1" {...props} />,
+                          }}
+                        >
+                          {m.content}
+                        </ReactMarkdown>
                       </div>
-                    ))}
-                    {sending && (
-                      <div className="max-w-[60%] rounded-2xl px-4 py-3 bg-slate-800 shadow text-white">
+                    </div>
+                  ))}
+                  {sending && (
+                    <div className="flex justify-start">
+                      <div className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl rounded-tl-none px-4 py-3 text-sm animate-pulse">
                         Escribiendo...
                       </div>
-                    )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Input Area */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+                  <div className="flex gap-2">
+                    <input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSend();
+                        }
+                      }}
+                      placeholder="Escribe tu mensaje..."
+                      className="flex-1 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-slate-900 dark:text-white placeholder-slate-400 text-sm"
+                    />
+                    <button
+                      disabled={sending || input.trim() === ''}
+                      onClick={handleSend}
+                      className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      aria-label="Enviar mensaje"
+                    >
+                      <IconSend size={20} />
+                    </button>
                   </div>
-                  <div className="border-t border-gray-200 p-3 bg-white">
-                    <div className="flex gap-2">
-                      <input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSend();
-                          }
-                        }}
-                        placeholder="Escribe tu consulta..."
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
+                  
+                  {/* Quick replies */}
+                  <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    {[
+                      'Presupuesto cocina',
+                      'Reforma integral',
+                      'Baño',
+                      'Locales',
+                    ].map((q) => (
                       <button
-                        disabled={sending || input.trim() === ''}
-                        onClick={handleSend}
-                        className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300"
+                        key={q}
+                        onClick={() => setInput(q)}
+                        className="whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
                       >
-                        Enviar
+                        {q}
                       </button>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {[
-                        'Quiero reformar una cocina',
-                        'Presupuesto para baño',
-                        'Disponibilidad para locales',
-                        'Asesoría en fachadas',
-                      ].map((q) => (
-                        <button
-                          key={q}
-                          onClick={() => setInput(q)}
-                          className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </div>
+                    ))}
                   </div>
                 </div>
               </motion.div>

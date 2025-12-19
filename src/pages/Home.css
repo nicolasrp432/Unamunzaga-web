@@ -75,7 +75,6 @@
 }
 
 .home-page p,
-.home-page span,
 .home-page li {
     color: var(--text-muted);
 }

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { cn } from '../../lib/utils';
+import { supabase } from '../../lib/supabase';
 
 interface FormData {
   name: string;

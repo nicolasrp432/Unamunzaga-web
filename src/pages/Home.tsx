@@ -24,10 +24,27 @@ import { mockKPIs } from '../data/mockData';
 import { useProjects } from '../hooks/useProjects';
 
 import { useTestimonials } from '../hooks/useTestimonials';
+import FAQSection from '../components/sections/FAQSection';
 
 const Home: React.FC = () => {
   const { projects, loading: projectsLoading } = useProjects();
   const { testimonials, loading: testimonialsLoading } = useTestimonials();
+
+  // Map database projects to the format expected by PortfolioSection
+  const mappedProjects: ProjectData[] = projects.map(p => ({
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    category: p.category || 'General',
+    location: p.location || 'Bilbao',
+    year: p.year ? parseInt(p.year) : new Date().getFullYear(),
+    duration: p.duration || 'Consultar',
+    budget: 'A consultar', // Default value since it's not in the database yet
+    images: p.images || [],
+    featured: p.is_featured,
+    services: [],
+    client_name: 'Cliente Privado'
+  }));
 
   return (
     <HelmetProvider>
@@ -35,14 +52,20 @@ const Home: React.FC = () => {
       <div className="min-h-screen home-page bg-dark-bg overflow-x-hidden">
         <ModernNavbar />
         <main>
-          <HeroSection kpis={mockKPIs} />
-          <PortfolioSection projects={projects} />
-          <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando servicios...</div>}>
-            <ServicesPreview />
-          </Suspense>
-          <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando testimonios...</div>}>
-            <TestimonialsSection testimonials={testimonials} loading={testimonialsLoading} />
-          </Suspense>
+          <div id="hero">
+            <HeroSection kpis={mockKPIs} />
+          </div>
+          <PortfolioSection projects={mappedProjects} />
+          <div id="features">
+            <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando servicios...</div>}>
+              <ServicesPreview />
+            </Suspense>
+          </div>
+          <div id="testimonials">
+            <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando testimonios...</div>}>
+              <TestimonialsSection testimonials={testimonials} loading={testimonialsLoading} />
+            </Suspense>
+          </div>
           <CTASection />
           <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando últimas publicaciones...</div>}>
             <LatestPostsCarousel />
@@ -50,6 +73,9 @@ const Home: React.FC = () => {
           <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando confianza de clientes...</div>}>
             <ClientTrust />
           </Suspense>
+          <div id="faq">
+            <FAQSection />
+          </div>
         </main>
         <ModernFooter />
         <FloatingWhatsApp />

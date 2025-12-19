@@ -7,6 +7,7 @@ import './Contact.css';
 
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import { Loader2 } from 'lucide-react';
+import FAQSection from '../components/sections/FAQSection';
 
 const Contact = () => {
     const { settings, loading: settingsLoading } = useSiteSettings();
@@ -29,14 +30,14 @@ const Contact = () => {
         // ... previous submit logic
         try {
             const { error } = await supabase
-                .from('contacts')
+                .from('contact_messages')
                 .insert([{
                     name: formData.name,
                     email: formData.email,
                     phone: formData.phone,
-                    service: formData.service,
+                    subject: formData.service,
                     message: formData.message,
-                    status: 'new'
+                    status: 'unread'
                 }]);
 
             if (error) throw error;
@@ -68,9 +69,9 @@ const Contact = () => {
                     </div>
                 </section>
 
-                <section className="contact-section">
+                <section className="contact-section" id="contact-info">
                     <div className="container contact-grid">
-                        <div className="contact-info-wrapper">
+                        <div className="contact-info-wrapper" id="horario">
                             <h2 className="contact-info-title">Información de Contacto</h2>
                             <p className="contact-info-subtitle">Visítanos en nuestras oficinas o llámanos para concertar una cita.</p>
 
@@ -124,7 +125,7 @@ const Contact = () => {
                             </div>
                         </div>
 
-                        <div className="contact-form-container">
+                        <div className="contact-form-container" id="formulario">
                             <h2>Envíanos un Mensaje</h2>
                             <p className="form-description">Completa el formulario y nos pondremos en contacto contigo lo antes posible.</p>
 
@@ -238,12 +239,14 @@ const Contact = () => {
                     </div>
                 </section>
 
-                <section className="map-section">
+                <FAQSection />
+
+                <section className="map-section" id="mapa">
                     <div className="container">
                         <h2 className="map-title">Encuéntranos</h2>
                         <div className="map-container">
                             <iframe
-                                src={settings?.google_maps_embed_url || "https://www.google.com/maps/embed?pb=..."}
+                                src={settings?.google_maps_embed_url || "https://maps.google.com/maps?q=Unamunzaga%20Obras%2C%20Hurtado%20de%20Am%C3%A9zaga%2027%2C%20Bilbao&t=&z=15&ie=UTF8&iwloc=&output=embed"}
                                 allowFullScreen=""
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
