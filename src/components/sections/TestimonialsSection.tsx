@@ -548,11 +548,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
                 }}
                 className="absolute inset-0 flex items-center justify-center w-full"
               >
-                <div className="bg-white rounded-3xl p-10 md:p-16 text-center w-full mx-auto shadow-xl border border-gray-100 relative overflow-hidden">
-                  {/* Subtle background decoration */}
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-blue-50/50 rounded-bl-full -mr-20 -mt-20" />
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-50/50 rounded-tr-full -ml-16 -mb-16" />
-                  
+                <div className="p-4 md:p-8 text-center w-full mx-auto relative">
                   {/* Client Image - Top Center */}
                   <motion.div 
                     initial={{ scale: 0, opacity: 0 }}
@@ -605,7 +601,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
                     className="mb-8"
                   >
                      <Quote className="w-8 h-8 text-blue-900/20 mx-auto mb-4" />
-                     <p className="text-lg text-gray-700 leading-relaxed whitespace-pre-line">
+                     <p className="text-xl md:text-2xl text-gray-800 font-medium italic leading-relaxed max-w-3xl mx-auto">
                       "{testimonials[currentIndex].testimonial_text}"
                      </p>
                   </motion.div>
@@ -619,11 +615,11 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
                     <h4 className="font-bold text-gray-900 text-xl mb-1">
                       {testimonials[currentIndex].client_name}
                     </h4>
-                    <p className="text-gray-600 font-medium">
+                    <p className="text-blue-600 font-semibold uppercase tracking-wider text-sm">
                       {testimonials[currentIndex].role}
                       {testimonials[currentIndex].company && (
-                        <span className="block text-sm text-gray-500 mt-1">
-                          {testimonials[currentIndex].company}
+                        <span className="text-gray-500 ml-2">
+                          | {testimonials[currentIndex].company}
                         </span>
                       )}
                     </p>

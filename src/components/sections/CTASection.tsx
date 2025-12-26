@@ -8,7 +8,8 @@ import {
   Send, 
   CheckCircle,
   Phone,
-  Mail 
+  Mail,
+  ChevronDown 
 } from 'lucide-react';
 import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { cn } from '../../lib/utils';
@@ -38,14 +39,27 @@ export const CTASection: React.FC = () => {
     setSubmitStatus('idle');
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // 1. Save to Supabase
+      const { error } = await supabase
+        .from('contacts')
+        .insert([
+          {
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            service: data.service,
+            message: data.message,
+            status: 'new'
+          }
+        ]);
+
+      if (error) throw error;
       
-      // Send WhatsApp message
+      // 2. Prepare WhatsApp message
       const whatsappMessage = `Hola, soy ${data.name}. Me gustaría solicitar un presupuesto para ${data.service}. Mi email es ${data.email} y mi teléfono es ${data.phone}. ${data.message}`;
       const whatsappUrl = `https://wa.me/34674274466?text=${encodeURIComponent(whatsappMessage)}`;
       
-      // Open WhatsApp in new tab
+      // 3. Open WhatsApp in new tab
       window.open(whatsappUrl, '_blank');
       
       setSubmitStatus('success');
@@ -57,7 +71,7 @@ export const CTASection: React.FC = () => {
       }, 5000);
       
     } catch (error) {
-      console.error(error);
+      console.error('Error submitting form:', error);
       setSubmitStatus('error');
       setTimeout(() => {
         setSubmitStatus('idle');
@@ -82,27 +96,78 @@ export const CTASection: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-24 bg-dark-bg border-t border-white/5">
+    <section id="contact" className="py-20 bg-gradient-to-br from-blue-900 via-blue-800 to-amber-600">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Info */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="space-y-10"
+            className="space-y-8"
           >
-            <div className="space-y-6">
-              <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-                ¿Tienes un proyecto
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                Solicita tu
                 <br />
-                <span className="text-white/60">en mente?</span>
+                <span className="text-amber-400">presupuesto</span>
               </h2>
-              <p className="text-lg text-white/40 leading-relaxed max-w-lg">
+              <p className="text-xl text-white/90 leading-relaxed">
                 Transformamos tu espacio con la garantía de más de 20 años de experiencia. 
-                Contacta con nosotros y recibe un presupuesto personalizado.
+                Contacta con nosotros y recibe un presupuesto personalizado en menos de 24 horas.
               </p>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="space-y-4">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm rounded-xl p-4"
+              >
+                <div className="bg-amber-500 rounded-full p-3">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold text-lg">Respuesta en menos de 24h</h3>
+                  <p className="text-white/80">Nos comprometemos a responderte rápidamente</p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm rounded-xl p-4"
+              >
+                <div className="bg-green-500 rounded-full p-3">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold text-lg">Asesoría gratuita</h3>
+                  <p className="text-white/80">Te ayudamos a definir tu proyecto sin compromiso</p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm rounded-xl p-4"
+              >
+                <div className="bg-blue-500 rounded-full p-3">
+                  <Calculator className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold text-lg">Presupuesto sin compromiso</h3>
+                  <p className="text-white/80">Transparente y detallado</p>
+                </div>
+              </motion.div>
             </div>
 
             {/* Contact Methods */}
@@ -110,139 +175,175 @@ export const CTASection: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-wrap gap-6"
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4"
             >
               <motion.button
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={openWhatsApp}
-                className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors"
+                className="flex items-center justify-center space-x-2 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
-                <div className="p-3 rounded-full bg-white/5">
-                  <IconBrandWhatsapp size={20} />
-                </div>
-                <span className="font-medium">WhatsApp</span>
+                <IconBrandWhatsapp size={20} />
+                <span>WhatsApp</span>
               </motion.button>
 
               <motion.button
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={sendEmail}
-                className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={callPhone}
+                className="flex items-center justify-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
-                <div className="p-3 rounded-full bg-white/5">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <span className="font-medium">Email</span>
+                <Phone className="w-5 h-5" />
+                <span>Llamar</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={sendEmail}
+                className="flex items-center justify-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                <Mail className="w-5 h-5" />
+                <span>Email</span>
               </motion.button>
             </motion.div>
           </motion.div>
 
           {/* Right Column - Form */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 md:p-10"
+            className="bg-white rounded-2xl p-8 shadow-2xl"
           >
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-white">Solicita tu presupuesto</h3>
-                <p className="text-white/40">Completa el formulario y te responderemos pronto.</p>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Formulario de contacto</h3>
+                <p className="text-gray-600">Completa el formulario y nos pondremos en contacto contigo</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Name */}
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium text-white/60">
-                    Nombre completo
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    {...register('name', { required: 'El nombre es obligatorio' })}
-                    className={cn(
-                      'w-full px-0 py-3 bg-transparent border-b border-white/10 focus:border-white outline-none transition-colors text-white placeholder:text-white/10',
-                      errors.name && 'border-red-500/50'
-                    )}
-                    placeholder="Tu nombre"
-                  />
-                </div>
+              {/* Name */}
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre completo *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  {...register('name', { required: 'El nombre es obligatorio' })}
+                  className={cn(
+                    'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300',
+                    errors.name ? 'border-red-500' : 'border-gray-300'
+                  )}
+                  placeholder="Juan García"
+                />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                )}
+              </div>
 
-                {/* Email */}
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-white/60">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    {...register('email', { 
-                      required: 'El email es obligatorio',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Email inválido'
-                      }
-                    })}
-                    className={cn(
-                      'w-full px-0 py-3 bg-transparent border-b border-white/10 focus:border-white outline-none transition-colors text-white placeholder:text-white/10',
-                      errors.email && 'border-red-500/50'
-                    )}
-                    placeholder="tu@email.com"
-                  />
-                </div>
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  {...register('email', { 
+                    required: 'El email es obligatorio',
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Email inválido'
+                    }
+                  })}
+                  className={cn(
+                    'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300',
+                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  )}
+                  placeholder="juan@ejemplo.com"
+                />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  Teléfono *
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  {...register('phone', { required: 'El teléfono es obligatorio' })}
+                  className={cn(
+                    'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300',
+                    errors.phone ? 'border-red-500' : 'border-gray-300'
+                  )}
+                  placeholder="600 000 000"
+                />
+                {errors.phone && (
+                  <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+                )}
               </div>
 
               {/* Service Type */}
-              <div className="space-y-2">
-                <label htmlFor="service" className="text-sm font-medium text-white/60">
+              <div className="relative">
+                <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-2">
                   Tipo de servicio
                 </label>
-                <select
-                  id="service"
-                  {...register('service')}
-                  className="w-full px-0 py-3 bg-transparent border-b border-white/10 focus:border-white outline-none transition-colors text-white appearance-none cursor-pointer"
-                >
-                  <option value="" className="bg-dark-bg">Selecciona un servicio</option>
-                  <option value="reforma-integral" className="bg-dark-bg">Reforma integral</option>
-                  <option value="cocina" className="bg-dark-bg">Reforma de cocina</option>
-                  <option value="bano" className="bg-dark-bg">Reforma de baño</option>
-                  <option value="local-comercial" className="bg-dark-bg">Local comercial</option>
-                  <option value="obra-nueva" className="bg-dark-bg">Obra nueva</option>
-                  <option value="otros" className="bg-dark-bg">Otros</option>
-                </select>
+                <div className="relative">
+                  <select
+                    id="service"
+                    {...register('service')}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 appearance-none bg-white"
+                  >
+                    <option value="">Selecciona un servicio</option>
+                    <option value="reforma-integral">Reforma integral</option>
+                    <option value="cocina">Reforma de cocina</option>
+                    <option value="bano">Reforma de baño</option>
+                    <option value="local-comercial">Local comercial</option>
+                    <option value="obra-nueva">Obra nueva</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div>
               </div>
 
               {/* Message */}
-              <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-medium text-white/60">
-                  Mensaje
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  Mensaje *
                 </label>
                 <textarea
                   id="message"
-                  rows={3}
+                  rows={4}
                   {...register('message', { required: 'El mensaje es obligatorio' })}
                   className={cn(
-                    'w-full px-0 py-3 bg-transparent border-b border-white/10 focus:border-white outline-none transition-colors text-white placeholder:text-white/10 resize-none',
-                    errors.message && 'border-red-500/50'
+                    'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none',
+                    errors.message ? 'border-red-500' : 'border-gray-300'
                   )}
                   placeholder="Cuéntanos sobre tu proyecto..."
                 />
+                {errors.message && (
+                  <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                )}
               </div>
 
               {/* Submit Button */}
               <motion.button
                 type="submit"
                 disabled={isSubmitting}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className={cn(
-                  'w-full py-4 rounded-lg font-semibold text-dark-bg transition-all duration-300',
+                  'w-full flex items-center justify-center space-x-2 px-6 py-4 rounded-xl font-semibold text-white transition-all duration-300 shadow-lg hover:shadow-xl',
                   isSubmitting
-                    ? 'bg-white/20 cursor-not-allowed'
-                    : 'bg-white hover:bg-white/90'
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700'
                 )}
               >
                 <AnimatePresence mode="wait">
@@ -252,9 +353,9 @@ export const CTASection: React.FC = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center justify-center space-x-2"
+                      className="flex items-center space-x-2"
                     >
-                      <div className="w-5 h-5 border-2 border-dark-bg border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>Enviando...</span>
                     </motion.div>
                   ) : (
@@ -263,10 +364,10 @@ export const CTASection: React.FC = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center justify-center space-x-2"
+                      className="flex items-center space-x-2"
                     >
                       <Send className="w-5 h-5" />
-                      <span>Solicitar presupuesto</span>
+                      <span>Enviar solicitud por WhatsApp</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -282,7 +383,7 @@ export const CTASection: React.FC = () => {
                     className="flex items-center space-x-2 p-4 bg-green-50 border border-green-200 rounded-lg"
                   >
                     <CheckCircle className="w-5 h-5 text-green-600" />
-                    <p className="text-green-800 font-medium">
+                    <p className="text-green-800 font-medium text-sm">
                       ¡Mensaje enviado! Te hemos redirigido a WhatsApp para completar el proceso.
                     </p>
                   </motion.div>
@@ -298,7 +399,7 @@ export const CTASection: React.FC = () => {
                     <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-xs">!</span>
                     </div>
-                    <p className="text-red-800 font-medium">
+                    <p className="text-red-800 font-medium text-sm">
                       Ha ocurrido un error. Por favor, inténtalo de nuevo.
                     </p>
                   </motion.div>
