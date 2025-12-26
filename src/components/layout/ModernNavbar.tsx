@@ -375,7 +375,7 @@ export const ModernNavbar: React.FC = () => {
         // Adjust offset based on navbar height (approx 5rem on desktop, 4rem on mobile)
         const headerOffset = window.innerWidth >= 1024 ? 90 : 70; 
         const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        const offsetPosition = elementPosition + window.scrollY - headerOffset;
 
         window.scrollTo({
           top: offsetPosition,
@@ -386,9 +386,10 @@ export const ModernNavbar: React.FC = () => {
 
     if (target.includes('#')) {
       const [path, hash] = target.split('#');
+      const normalizedCurrentPath = location.pathname.replace(/\/$/, '') || '/';
+      const normalizedTargetPath = path.replace(/\/$/, '') || '/';
       
-      // If we are on the same page (ignoring query params for simplicity, or strict check)
-      if (location.pathname === path || (path === '' && hash)) {
+      if (normalizedCurrentPath === normalizedTargetPath || (path === '' && hash)) {
         setTimeout(() => smoothScrollTo(hash), 100);
       } else {
         // Navigate to the page first

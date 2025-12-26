@@ -1,45 +1,66 @@
 import { useState, useEffect } from 'react';
 import { Testimonial } from '../types';
+import { supabase } from '../lib/supabase';
 
 export const useTestimonials = () => {
-    // Hardcoded testimonials as requested by the user, bypassing Supabase for now to ensure content control without DB access
-    const [testimonials, setTestimonials] = useState<Testimonial[]>([
-        {
-            id: '1',
-            client_name: 'María García',
-            company: 'Propietaria de Vivienda',
-            role: 'Cliente',
-            rating: 5,
-            testimonial_text: 'Ha sido muy divertido trabajar con Unamunzaga Obras, esa cercanía que nos han transmitido ha quedado reflejada en los trabajos realizados. La verdad es que estamos muy contentos ya que muchos de nuestros clientes nos han felicitado por ello. Nos han ayudado a mostrar nuestro trabajo de una manera fresca y diferente.',
-            avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80',
-            created_at: new Date().toISOString()
-        },
-        {
-            id: '2',
-            client_name: 'Carlos Ruiz',
-            company: 'Arquitectos CR',
-            role: 'Arquitecto',
-            rating: 5,
-            testimonial_text: 'La atención al detalle en la ejecución de la obra fue impecable. Cumplieron con los plazos establecidos y la gestión de todo el proceso fue transparente y profesional. Sin duda volveremos a colaborar en futuros proyectos.',
-            avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80',
-            created_at: new Date().toISOString()
-        },
-        {
-            id: '3',
-            client_name: 'Laura Mendieta',
-            company: 'Boutique Zazpi',
-            role: 'Dueña de Negocio',
-            rating: 5,
-            testimonial_text: 'Transformaron nuestro local comercial por completo. Entendieron perfectamente la identidad de nuestra marca y la plasmaron en cada rincón. La iluminación y los acabados son justo lo que buscábamos. ¡Recomendados 100%!',
-            avatar_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80',
-            created_at: new Date().toISOString()
-        }
-    ]);
-    const [loading, setLoading] = useState(false);
+    const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // If we wanted to keep the fetch but fallback, we could, but user wants this specific data NOW.
-    // So we just return the state.
+    useEffect(() => {
+        const fetchTestimonials = async () => {
+            try {
+                setLoading(true);
+                const { data, error: fetchError } = await supabase
+                    .from('testimonials')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (fetchError) throw fetchError;
+
+                if (data) {
+                    const mappedTestimonials: Testimonial[] = data.map((item: any) => ({
+                        id: item.id,
+                        client_name: item.client_name,
+                        role: item.role || '',
+                        testimonial_text: item.testimonial_text,
+                        avatar_url: item.image_url || undefined,
+                        company: item.company || undefined,
+                        rating: item.rating || 5,
+                        created_at: item.created_at
+                    }));
+                    setTestimonials(mappedTestimonials);
+                }
+            } catch (err: any) {
+                console.error('Error fetching testimonials:', err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTestimonials();
+
+        // Optional: Subscribe to changes
+        const channel = supabase
+            .channel('testimonials_hook_changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'testimonials'
+                },
+                () => {
+                    fetchTestimonials();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, []);
 
     return { testimonials, loading, error };
 };

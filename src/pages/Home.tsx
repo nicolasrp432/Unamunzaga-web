@@ -4,16 +4,14 @@ import './Home.css';
 import { ModernNavbar } from '../components/layout/ModernNavbar';
 import { HeroSection } from '../components/sections/HeroSection';
 import { PortfolioSection } from '../components/sections/PortfolioSection';
-const TestimonialsSection = lazy(() =>
-  import('../components/sections/TestimonialsSection').then((m) => ({ default: m.TestimonialsSection }))
-);
+import { TestimonialsSection } from '../components/sections/TestimonialsSection';
 const ServicesPreview = lazy(() =>
   import('../components/sections/ServicesPreview').then((m) => ({ default: m.ServicesPreview }))
 );
 const LatestPostsCarousel = lazy(() =>
   import('../components/sections/LatestPostsCarousel').then((m) => ({ default: m.LatestPostsCarousel }))
 );
-const ClientTrust = lazy(() => import('../components/sections/ClientTrust'));
+import ClientTrust from '../components/sections/ClientTrust';
 import ModernFooter from '../components/layout/ModernFooter';
 import { CTASection } from '../components/sections/CTASection';
 import FloatingWhatsApp from '../components/ui/FloatingWhatsApp';
@@ -62,17 +60,13 @@ const Home: React.FC = () => {
             </Suspense>
           </div>
           <div id="testimonials">
-            <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando testimonios...</div>}>
-              <TestimonialsSection testimonials={testimonials} loading={testimonialsLoading} />
-            </Suspense>
+            <TestimonialsSection testimonials={testimonials} loading={testimonialsLoading} />
           </div>
           <CTASection />
           <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando últimas publicaciones...</div>}>
             <LatestPostsCarousel />
           </Suspense>
-          <Suspense fallback={<div className="py-8 text-center text-white/80">Cargando confianza de clientes...</div>}>
-            <ClientTrust />
-          </Suspense>
+          <ClientTrust />
           <div id="faq">
             <FAQSection />
           </div>

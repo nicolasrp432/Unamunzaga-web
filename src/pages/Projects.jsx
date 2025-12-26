@@ -2,8 +2,13 @@ import { ModernNavbar } from '../components/layout/ModernNavbar';
 import ModernFooter from '../components/layout/ModernFooter';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Filter, Calendar, MapPin, Euro, Clock, Star, Eye, ArrowRight, Loader2 } from 'lucide-react';
+import { Filter, Calendar, Loader2, AlertTriangle, Search, X } from 'lucide-react';
 import { useProjects } from '../hooks/useProjects';
+import { FilterButtons } from '../components/portfolio/FilterButtons';
+import { ViewToggle } from '../components/portfolio/ViewToggle';
+import { ProjectGrid } from '../components/portfolio/ProjectGrid';
+import { PORTFOLIO_CATEGORIES, getCategoryName, getCategoryIcon } from '../constants/portfolio';
+import { CTASection } from '../components/sections/CTASection';
 import './Portfolio.css';
 
 const Projects = () => {
@@ -13,18 +18,7 @@ const Projects = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('grid');
 
-  const categories = useMemo(() => {
-    return [
-      'all',
-      'trabajos-recientes',
-      'bares-restaurantes',
-      'viviendas',
-      'fachadas',
-      'locales-comerciales',
-      'tejados',
-      'insonorizacion'
-    ];
-  }, []);
+  const categories = useMemo(() => [...PORTFOLIO_CATEGORIES], []);
 
   const years = useMemo(() => {
     const yrs = new Set();
@@ -51,15 +45,15 @@ const Projects = () => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return b.year - a.year;
+          return (b.year || 0) - (a.year || 0);
         case 'oldest':
-          return a.year - b.year;
+          return (a.year || 0) - (b.year || 0);
         case 'featured':
           return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
         case 'budget-high':
-          return parseInt(b.budget.replace(/\D/g, '')) - parseInt(a.budget.replace(/\D/g, ''));
+          return (parseInt(b.budget?.replace(/\D/g, '') || '0')) - (parseInt(a.budget?.replace(/\D/g, '') || '0'));
         case 'budget-low':
-          return parseInt(a.budget.replace(/\D/g, '')) - parseInt(b.budget.replace(/\D/g, ''));
+          return (parseInt(a.budget?.replace(/\D/g, '') || '0')) - (parseInt(b.budget?.replace(/\D/g, '') || '0'));
         default:
           return 0;
       }
@@ -67,33 +61,6 @@ const Projects = () => {
 
     return filtered;
   }, [projects, selectedCategory, selectedYear, sortBy]);
-
-  const getCategoryName = (category) => {
-    const names = {
-      'all': 'Todos',
-      'trabajos-recientes': 'TRABAJOS RECIENTES',
-      'bares-restaurantes': 'BARES Y RESTAURANTES',
-      'viviendas': 'VIVIENDAS',
-      'fachadas': 'FACHADAS',
-      'locales-comerciales': 'LOCALES COMERCIALES',
-      'tejados': 'TEJADOS',
-      'insonorizacion': 'INSONORIZACIÓN'
-    };
-    return names[category] || category;
-  };
-
-  const getCategoryIcon = (category) => {
-    const icons = {
-      'trabajos-recientes': '🆕',
-      'bares-restaurantes': '🍽️',
-      'viviendas': '🏠',
-      'fachadas': '🏢',
-      'locales-comerciales': '🏪',
-      'tejados': '🏚️',
-      'insonorizacion': '🔇'
-    };
-    return icons[category] || '📋';
-  };
 
   if (loading) {
     return (
@@ -107,7 +74,9 @@ const Projects = () => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center px-4">
-        <div className="text-red-500 text-5xl mb-4">⚠️</div>
+        <div className="text-red-500 mb-4">
+          <AlertTriangle size={64} />
+        </div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Error al cargar proyectos</h2>
         <p className="text-gray-600 mb-6">{error}</p>
         <button onClick={() => window.location.reload()} className="px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
@@ -130,181 +99,93 @@ const Projects = () => {
 
         <section className="section projects-section">
           <div className="container">
-            {/* Filters */}
-            <div className="projects-filters">
-              <div className="filter-group">
-                <label><Filter size={16} /> Categoría</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="filter-select"
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {getCategoryName(category)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* Main Category Filter */}
+            <div className="mb-12">
+              <FilterButtons
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                getCategoryName={getCategoryName}
+                getCategoryIcon={getCategoryIcon}
+              />
+            </div>
 
-              <div className="filter-group">
-                <label><Calendar size={16} /> Año</label>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="filter-select"
-                >
-                  {years.map(year => (
-                    <option key={year} value={year}>
-                      {year === 'all' ? 'Todos los años' : year}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Ordenar por</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="newest">Más recientes</option>
-                  <option value="oldest">Más antiguas</option>
-                  <option value="featured">Destacados</option>
-                  <option value="budget-high">Mayor presupuesto</option>
-                  <option value="budget-low">Menor presupuesto</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Vista</label>
-                <div className="view-toggle">
-                  <button
-                    className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                    onClick={() => setViewMode('grid')}
+            {/* Sub-Filters and View Toggle */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Calendar size={18} className="text-amber-500" />
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
                   >
-                    ⊞ Grid
-                  </button>
-                  <button
-                    className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                    onClick={() => setViewMode('list')}
+                    {years.map(year => (
+                      <option key={year} value={year}>
+                        {year === 'all' ? 'Todos los años' : year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Filter size={18} className="text-amber-500" />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
                   >
-                    ☰ Lista
-                  </button>
+                    <option value="newest">Más recientes</option>
+                    <option value="oldest">Más antiguas</option>
+                    <option value="featured">Destacados</option>
+                    <option value="budget-high">Mayor presupuesto</option>
+                    <option value="budget-low">Menor presupuesto</option>
+                  </select>
                 </div>
               </div>
+
+              <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
             </div>
 
             {/* Results summary */}
-            <div className="results-summary">
-              <p>Mostrando <strong>{filteredProjects.length}</strong> proyectos</p>
-              <div className="category-tags">
+            <div className="results-summary mb-8 flex flex-wrap items-center justify-between gap-4">
+              <p className="text-gray-600">
+                Mostrando <strong className="text-gray-900">{filteredProjects.length}</strong> proyectos
+              </p>
+              <div className="flex flex-wrap gap-2">
                 {selectedCategory !== 'all' && (
-                  <span className="active-filter">
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full text-sm font-medium border border-amber-100">
                     {getCategoryIcon(selectedCategory)} {getCategoryName(selectedCategory)}
-                    <button onClick={() => setSelectedCategory('all')}>×</button>
+                    <button 
+                      onClick={() => setSelectedCategory('all')}
+                      className="hover:text-amber-900 transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
                   </span>
                 )}
                 {selectedYear !== 'all' && (
-                  <span className="active-filter">
-                    📅 {selectedYear}
-                    <button onClick={() => setSelectedYear('all')}>×</button>
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium border border-blue-100">
+                    <Calendar size={14} /> {selectedYear}
+                    <button 
+                      onClick={() => setSelectedYear('all')}
+                      className="hover:text-blue-900 transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
                   </span>
                 )}
               </div>
             </div>
 
             {/* Projects Grid/List */}
-            <div className={`projects-container ${viewMode}`}>
-              {filteredProjects.map((project) => (
-                <div key={project.id} className={`project-card ${viewMode}`}>
-                  <div className="project-image">
-                    <img
-                      src={project.images && project.images[0] ? project.images[0] : '/placeholder-project.jpg'}
-                      alt={project.title}
-                      loading="lazy"
-                    />
-                    {project.featured && (
-                      <div className="featured-badge">
-                        <Star size={16} />
-                        <span>Destacado</span>
-                      </div>
-                    )}
-                    <div className="project-overlay">
-                      <Link to={`/proyectos/${project.id}`} className="view-project">
-                        <Eye size={20} />
-                        Ver Proyecto
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="project-content">
-                    <div className="project-header">
-                      <h3>{project.title}</h3>
-                      <div className="project-meta">
-                        <span className="category">
-                          {getCategoryIcon(project.category)} {getCategoryName(project.category)}
-                        </span>
-                        <span className="year">📅 {project.year}</span>
-                      </div>
-                    </div>
-
-                    <p className="project-description">{project.description}</p>
-
-                    <div className="project-details">
-                      <div className="detail-item">
-                        <MapPin size={16} />
-                        <span>{project.location}</span>
-                      </div>
-                      <div className="detail-item">
-                        <Clock size={16} />
-                        <span>{project.duration}</span>
-                      </div>
-                      <div className="detail-item">
-                        <Euro size={16} />
-                        <span>{project.budget}</span>
-                      </div>
-                    </div>
-
-                    <div className="project-services">
-                      <h4>Servicios incluidos:</h4>
-                      <div className="services-tags">
-                        {project.services && project.services.map((service, index) => (
-                          <span key={index} className="service-tag">
-                            {service}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {project.testimonial && (
-                      <div className="project-testimonial">
-                        <blockquote>
-                          "{project.testimonial}"
-                        </blockquote>
-                        <cite>— {project.client_name}</cite>
-                      </div>
-                    )}
-
-                    <div className="project-actions">
-                      <Link to={`/proyectos/${project.id}`} className="btn btn-primary">
-                        Ver Detalles
-                        <ArrowRight size={16} />
-                      </Link>
-                      <Link to={`/proyectos/${project.id}#tour`} className="btn btn-outline" style={{ marginLeft: '0.5rem' }}>
-                        <Eye size={16} />
-                        Tour 360°
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ProjectGrid projects={filteredProjects} viewMode={viewMode} />
 
             {filteredProjects.length === 0 && (
               <div className="no-results">
-                <div className="no-results-icon">🔍</div>
+                <div className="no-results-icon">
+                  <Search size={48} className="text-gray-400 mb-4" />
+                </div>
                 <h3>No se encontraron proyectos</h3>
                 <p>Intenta ajustar los filtros para ver más resultados.</p>
                 <button
@@ -322,15 +203,7 @@ const Projects = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="section cta-section">
-          <div className="container text-center">
-            <h2>¿Tienes un proyecto en mente?</h2>
-            <p>Contáctanos y te ayudaremos a hacerlo realidad con la misma calidad que ves en nuestros proyectos.</p>
-            <Link to="/contacto" className="btn btn-primary btn-lg">
-              Solicitar Presupuesto
-            </Link>
-          </div>
-        </section>
+        <CTASection />
       </div>
       <ModernFooter />
     </>

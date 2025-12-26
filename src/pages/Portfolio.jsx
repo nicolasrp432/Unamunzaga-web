@@ -1,27 +1,22 @@
 import { ModernNavbar } from '../components/layout/ModernNavbar';
 import ModernFooter from '../components/layout/ModernFooter';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ProjectCard from '../components/portfolio/ProjectCard';
 import KuulaTour from '../components/kuula/KuulaTour';
 import { useProjects } from '../hooks/useProjects';
+import { FilterButtons } from '../components/portfolio/FilterButtons';
+import { ViewToggle } from '../components/portfolio/ViewToggle';
+import { ProjectGrid } from '../components/portfolio/ProjectGrid';
+import { PORTFOLIO_CATEGORIES, getCategoryName, getCategoryIcon } from '../constants/portfolio';
+import { CTASection } from '../components/sections/CTASection';
 import './Portfolio.css';
 
 const Portfolio = () => {
     const { projects, loading } = useProjects();
     const [filter, setFilter] = useState('all');
+    const [viewMode, setViewMode] = useState('grid');
 
-    const mappedProjects = projects.map(p => ({
-        id: p.id,
-        title: p.title,
-        category: p.category || 'viviendas', // default category
-        location: p.location || '',
-        image: p.images && p.images.length > 0 ? p.images[0] : ''
-    }));
-
-    const filteredProjects = filter === 'all'
-        ? mappedProjects
-        : mappedProjects.filter(project => project.category === filter);
+    const categories = useMemo(() => [...PORTFOLIO_CATEGORIES], []);
 
     return (
         <>
@@ -36,30 +31,27 @@ const Portfolio = () => {
 
             <section className="section">
                 <div className="container">
-                    <div className="filter-buttons mb-lg">
-                        {['all', 'viviendas', 'locales', 'fachadas'].map((cat) => (
-                            <button
-                                key={cat}
-                                className={`filter-btn ${filter === cat ? 'active' : ''}`}
-                                onClick={() => setFilter(cat)}
-                            >
-                                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                            </button>
-                        ))}
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+                        <FilterButtons
+                            categories={categories}
+                            selectedCategory={filter}
+                            onCategoryChange={setFilter}
+                            getCategoryName={getCategoryName}
+                            getCategoryIcon={getCategoryIcon}
+                        />
+                        <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
                     </div>
 
                     {loading ? (
-                        <div className="text-center py-12">
-                            <div className="loader">Cargando proyectos...</div>
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p className="text-gray-600 animate-pulse">Cargando proyectos...</p>
                         </div>
                     ) : (
-                        <motion.div layout className="projects-grid">
-                            <AnimatePresence>
-                                {filteredProjects.map(project => (
-                                    <ProjectCard key={project.id} project={project} />
-                                ))}
-                            </AnimatePresence>
-                        </motion.div>
+                        <ProjectGrid 
+                            projects={filter === 'all' ? projects : projects.filter(p => p.category === filter)} 
+                            viewMode={viewMode}
+                        />
                     )}
                 </div>
             </section>
@@ -97,6 +89,7 @@ const Portfolio = () => {
                     ))}
                 </div>
             </section>
+            <CTASection />
         </div>
         <ModernFooter />
         </>

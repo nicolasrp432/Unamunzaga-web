@@ -30,6 +30,21 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
   const [isLoading, setIsLoading] = useState(initialLoading || false);
   const [fetchError, setFetchError] = useState<string | null>(initialError || null);
   
+  // Update local state when props change
+  useEffect(() => {
+    if (initialTestimonials.length > 0) {
+      setTestimonials(initialTestimonials);
+    }
+  }, [initialTestimonials]);
+
+  useEffect(() => {
+    setIsLoading(initialLoading || false);
+  }, [initialLoading]);
+
+  useEffect(() => {
+    setFetchError(initialError || null);
+  }, [initialError]);
+  
   // Slider State
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -54,8 +69,10 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
   const [formData, setFormData] = useState(initialFormState);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch testimonials from Supabase
+  // Fetch testimonials from Supabase (only if not provided via props)
   const fetchTestimonials = async () => {
+    if (initialTestimonials.length > 0) return;
+    
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -83,14 +100,13 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
     } catch (err: any) {
       console.error('Error fetching testimonials:', err);
       setFetchError(err.message);
-      if (initialTestimonials.length > 0) setTestimonials(initialTestimonials);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    // Initial fetch
+    // Initial fetch if needed
     fetchTestimonials();
 
     // Real-time subscription
@@ -105,6 +121,8 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
         },
         (payload) => {
           console.log('Real-time change received for testimonials:', payload);
+          // If we have an external fetcher (hook), we might not need this here
+          // but for the admin mode it's useful
           fetchTestimonials();
         }
       )
@@ -530,26 +548,34 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
                 }}
                 className="absolute inset-0 flex items-center justify-center w-full"
               >
-                <div className="bg-gray-50 rounded-2xl p-8 md:p-12 text-center w-full mx-auto shadow-sm">
+                <div className="bg-white rounded-3xl p-10 md:p-16 text-center w-full mx-auto shadow-xl border border-gray-100 relative overflow-hidden">
+                  {/* Subtle background decoration */}
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-blue-50/50 rounded-bl-full -mr-20 -mt-20" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-50/50 rounded-tr-full -ml-16 -mb-16" />
+                  
                   {/* Client Image - Top Center */}
                   <motion.div 
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className="mb-6 flex justify-center"
+                    className="mb-8 flex justify-center relative z-10"
                   >
                     {testimonials[currentIndex].avatar_url ? (
-                      <img
-                        src={testimonials[currentIndex].avatar_url}
-                        alt={testimonials[currentIndex].client_name}
-                        className="w-[150px] h-[150px] rounded-full object-cover border-4 border-white shadow-lg"
-                      />
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-blue-900 rounded-full blur-md opacity-20 transform scale-110" />
+                        <img
+                          src={testimonials[currentIndex].avatar_url}
+                          alt={testimonials[currentIndex].client_name}
+                          className="w-[140px] h-[140px] md:w-[160px] md:h-[160px] rounded-full object-cover border-4 border-white shadow-xl relative z-10"
+                        />
+                      </div>
                     ) : (
-                      <div className="w-[150px] h-[150px] rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-lg">
-                         <span className="text-4xl text-gray-400 font-bold">{testimonials[currentIndex].client_name.charAt(0)}</span>
+                      <div className="w-[140px] h-[140px] md:w-[160px] md:h-[160px] rounded-full bg-gradient-to-br from-blue-900 to-blue-800 flex items-center justify-center border-4 border-white shadow-xl relative z-10">
+                         <span className="text-5xl text-white font-bold">{testimonials[currentIndex].client_name.charAt(0)}</span>
                       </div>
                     )}
                   </motion.div>
+
 
                   {/* Rating */}
                   <motion.div
@@ -610,19 +636,19 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
           {/* Navigation Buttons */}
           <button
             onClick={prevTestimonial}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-20"
+            className="absolute -left-4 md:-left-12 top-1/2 transform -translate-y-1/2 p-4 bg-white text-blue-900 rounded-full shadow-xl hover:bg-blue-900 hover:text-white transition-all duration-300 hover:scale-110 z-20 border border-gray-100 group"
             aria-label="Anterior"
             type="button"
           >
-            <ChevronLeft className="w-6 h-6 text-gray-700" />
+            <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
           </button>
           <button
             onClick={nextTestimonial}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-20"
+            className="absolute -right-4 md:-right-12 top-1/2 transform -translate-y-1/2 p-4 bg-white text-blue-900 rounded-full shadow-xl hover:bg-blue-900 hover:text-white transition-all duration-300 hover:scale-110 z-20 border border-gray-100 group"
             aria-label="Siguiente"
             type="button"
           >
-            <ChevronRight className="w-6 h-6 text-gray-700" />
+            <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
         ) : (

@@ -1,7 +1,8 @@
 import { ModernNavbar } from '../components/layout/ModernNavbar';
 import ModernFooter from '../components/layout/ModernFooter';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   ArrowRight,
@@ -11,15 +12,18 @@ import {
   Clock,
   Star,
   CheckCircle,
-  User,
   Phone,
-  Mail,
   ChevronLeft,
   ChevronRight,
-  Loader2
+  Loader2,
+  Maximize2,
+  XCircle
 } from 'lucide-react';
 import { useProject, useProjects } from '../hooks/useProjects';
-import KuulaTour, { DEFAULT_KUULA_SRC, SAMPLE_COLLECTION_SRC } from '../components/kuula/KuulaTour';
+import ProjectCard from '../components/portfolio/ProjectCard';
+import { CTASection } from '../components/sections/CTASection';
+import KuulaTour from '../components/kuula/KuulaTour';
+import { getCategoryName, getCategoryIcon } from '../constants/portfolio';
 import './ProjectDetail.css';
 
 const ProjectDetail = () => {
@@ -30,6 +34,15 @@ const ProjectDetail = () => {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [viewMode, setViewMode] = useState('images');
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  // Filter related projects - Moved here to follow Rules of Hooks
+  const relatedProjects = useMemo(() => {
+    if (!project || !allProjects) return [];
+    return allProjects
+      .filter(p => p.id !== project.id && p.category === project.category)
+      .slice(0, 3);
+  }, [allProjects, project?.id, project?.category]);
 
   useEffect(() => {
     if (window.location && window.location.hash === '#tour') {
@@ -49,32 +62,6 @@ const ProjectDetail = () => {
     }
   };
 
-  const getCategoryName = (category) => {
-    const names = {
-      'trabajos-recientes': 'TRABAJOS RECIENTES',
-      'bares-restaurantes': 'BARES Y RESTAURANTES',
-      'viviendas': 'VIVIENDA',
-      'fachadas': 'FACHADA',
-      'locales-comerciales': 'LOCAL COMERCIAL',
-      'tejados': 'TEJADOS',
-      'insonorizacion': 'INSONORIZACIÓN'
-    };
-    return names[category] || category;
-  };
-
-  const getCategoryIcon = (category) => {
-    const icons = {
-      'trabajos-recientes': '🆕',
-      'bares-restaurantes': '🍽️',
-      'viviendas': '🏠',
-      'fachadas': '🏢',
-      'locales-comerciales': '🏪',
-      'tejados': '🏚️',
-      'insonorizacion': '🔇'
-    };
-    return icons[category] || '📋';
-  };
-
   if (projectLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -88,9 +75,11 @@ const ProjectDetail = () => {
     return (
       <div className="page project-detail-page">
         <div className="error-container">
-          <div className="error-icon">❌</div>
-          <h2>Proyecto no encontrado</h2>
-          <p>El proyecto que buscas no existe o ha sido eliminado.</p>
+          <div className="error-icon">
+            <XCircle className="w-16 h-16 text-red-500 mb-4" />
+          </div>
+          <h2>{projectError ? 'Error al cargar el proyecto' : 'Proyecto no encontrado'}</h2>
+          <p>{projectError ? projectError.message : 'El proyecto que buscas no existe o ha sido eliminado.'}</p>
           <Link to="/proyectos" className="btn btn-primary">
             <ArrowLeft size={16} />
             Volver a Proyectos
@@ -99,11 +88,6 @@ const ProjectDetail = () => {
       </div>
     );
   }
-
-  // Filter related projects
-  const relatedProjects = allProjects
-    .filter(p => p.id !== project.id && p.category === project.category)
-    .slice(0, 3);
 
   return (
     <>
@@ -148,19 +132,20 @@ const ProjectDetail = () => {
         </section>
 
         {/* Media Gallery */}
-        <section className="project-gallery">
+        <section className="project-gallery py-12 bg-gray-50">
           <div className="container">
-            <div className="gallery-container">
-              <div className="gallery-header" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-                <div className="view-toggle">
+            <div className="gallery-container bg-white p-4 rounded-3xl shadow-xl border border-gray-100">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-800">Galería de obra</h2>
+                <div className="bg-gray-100 p-1 rounded-xl flex gap-1">
                   <button
-                    className={`view-btn ${viewMode === 'images' ? 'active' : ''}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${viewMode === 'images' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     onClick={() => setViewMode('images')}
                   >
                     Imágenes
                   </button>
                   <button
-                    className={`view-btn ${viewMode === 'tour' ? 'active' : ''}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${viewMode === 'tour' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     onClick={() => setViewMode('tour')}
                   >
                     Tour 360°
@@ -169,149 +154,238 @@ const ProjectDetail = () => {
               </div>
 
               {viewMode === 'images' ? (
-                <>
-                  <div className="main-image">
-                    <img
-                      src={project.images && project.images[currentImageIndex] ? project.images[currentImageIndex] : '/placeholder-project.jpg'}
-                      alt={`${project.title} - Imagen ${currentImageIndex + 1}`}
-                      loading="lazy"
-                    />
+                <div className="space-y-6">
+                  <div className="relative aspect-video rounded-2xl overflow-hidden group bg-gray-900">
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={currentImageIndex}
+                        src={project.images?.[currentImageIndex] || '/placeholder-project.jpg'}
+                        alt={`${project.title} - Imagen ${currentImageIndex + 1}`}
+                        initial={{ opacity: 0, scale: 1.1 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.4 }}
+                        className="w-full h-full object-contain cursor-zoom-in"
+                        onClick={() => setIsLightboxOpen(true)}
+                      />
+                    </AnimatePresence>
+                    
+                    <div className="absolute top-4 right-4 z-10">
+                      <button 
+                        onClick={() => setIsLightboxOpen(true)}
+                        className="p-3 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <Maximize2 size={20} />
+                      </button>
+                    </div>
+
                     {project.images && project.images.length > 1 && (
-                      <>
+                      <div className="absolute inset-0 flex items-center justify-between p-4 pointer-events-none">
                         <button
-                          className="gallery-nav prev"
+                          className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-md transition-all pointer-events-auto"
                           onClick={prevImage}
-                          aria-label="Imagen anterior"
                         >
-                          <ChevronLeft size={24} />
+                          <ChevronLeft size={28} />
                         </button>
                         <button
-                          className="gallery-nav next"
+                          className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-md transition-all pointer-events-auto"
                           onClick={nextImage}
-                          aria-label="Imagen siguiente"
                         >
-                          <ChevronRight size={24} />
+                          <ChevronRight size={28} />
                         </button>
-                      </>
+                      </div>
                     )}
+
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-black/50 text-white rounded-full text-xs backdrop-blur-md">
+                      {currentImageIndex + 1} / {project.images?.length || 0}
+                    </div>
                   </div>
+
                   {project.images && project.images.length > 1 && (
-                    <div className="thumbnail-gallery">
+                    <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
                       {project.images.map((image, index) => (
                         <button
                           key={index}
-                          className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
+                          className={`relative flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 transition-all ${index === currentImageIndex ? 'border-amber-500 scale-105' : 'border-transparent opacity-60 hover:opacity-100'}`}
                           onClick={() => setCurrentImageIndex(index)}
-                          aria-label={`Ver imagen ${index + 1}`}
                         >
-                          <img src={image} alt={`Miniatura ${index + 1}`} loading="lazy" />
+                          <img src={image} alt={`Miniatura ${index + 1}`} className="w-full h-full object-cover" />
                         </button>
                       ))}
                     </div>
                   )}
-                </>
+                </div>
               ) : (
-                <KuulaTour
-                  id={project.id}
-                  title={project.title}
-                  description={project.location}
-                />
+                <div className="aspect-video rounded-2xl overflow-hidden border border-gray-100 shadow-inner bg-gray-50">
+                  <KuulaTour
+                    id={project.id}
+                    title={project.title}
+                    description={project.location}
+                  />
+                </div>
               )}
             </div>
           </div>
         </section>
 
+        {/* Lightbox Modal */}
+        <AnimatePresence>
+          {isLightboxOpen && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] bg-black/95 flex flex-col p-4 md:p-8"
+            >
+              <button 
+                onClick={() => setIsLightboxOpen(false)}
+                className="absolute top-6 right-6 p-2 text-white/70 hover:text-white transition-colors z-50"
+              >
+                <ArrowLeft className="rotate-45" size={32} />
+              </button>
+
+              <div className="flex-1 relative flex items-center justify-center">
+                <motion.img 
+                  key={currentImageIndex}
+                  src={project.images?.[currentImageIndex]}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="max-w-full max-h-full object-contain"
+                />
+
+                <button onClick={prevImage} className="absolute left-4 p-4 text-white/50 hover:text-white transition-colors">
+                  <ChevronLeft size={48} />
+                </button>
+                <button onClick={nextImage} className="absolute right-4 p-4 text-white/50 hover:text-white transition-colors">
+                  <ChevronRight size={48} />
+                </button>
+              </div>
+
+              <div className="mt-8 flex gap-2 overflow-x-auto justify-center pb-4">
+                {project.images?.map((img, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${idx === currentImageIndex ? 'border-amber-500' : 'border-transparent opacity-40'}`}
+                  >
+                    <img src={img} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Project Info */}
-        <section className="project-info">
+        <section className="project-info py-16">
           <div className="container">
-            <div className="info-grid">
-              <div className="info-main">
-                <div className="description-section">
-                  <h2>Descripción del Proyecto</h2>
-                  <p className="description-text">{project.description}</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              <div className="lg:col-span-2 space-y-12">
+                <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <span className="w-2 h-8 bg-amber-500 rounded-full"></span>
+                    Descripción del Proyecto
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed text-lg">{project.description}</p>
                 </div>
 
-                {/*  Challenge and solution properties might not exist on DB schema v1 - checking existence */}
-                {/* If they are in the DB text columns but not in the original JSON, we can render them optionally */}
-
-                <div className="services-section">
-                  <h3>Servicios Realizados</h3>
-                  <div className="services-grid">
+                <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">Servicios Realizados</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {project.services && project.services.map((service, index) => (
-                      <div key={index} className="service-item">
-                        <CheckCircle size={16} className="service-icon" />
-                        <span>{service}</span>
+                      <div key={index} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl group hover:bg-amber-50 transition-colors">
+                        <div className="w-8 h-8 flex items-center justify-center bg-white text-amber-500 rounded-full shadow-sm group-hover:bg-amber-500 group-hover:text-white transition-all">
+                          <CheckCircle size={18} />
+                        </div>
+                        <span className="font-medium text-gray-700">{service}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="details-gallery">
-                  <h3>Galería del Proyecto</h3>
-                  <div className="details-gallery-grid">
+                <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">Todas las imágenes ({project.images?.length})</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {project.images && project.images.map((image, index) => (
-                      <button
+                      <motion.button
                         key={index}
-                        type="button"
-                        className={`details-gallery-item ${index === currentImageIndex ? 'active' : ''}`}
-                        onClick={() => setCurrentImageIndex(index)}
-                        aria-label={`Ver imagen ${index + 1} en grande`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all ${index === currentImageIndex ? 'border-amber-500 shadow-lg' : 'border-transparent'}`}
+                        onClick={() => {
+                          setCurrentImageIndex(index);
+                          setViewMode('images');
+                          window.scrollTo({ top: 400, behavior: 'smooth' });
+                        }}
                       >
-                        <img src={image} alt={`Galería ${index + 1}`} loading="lazy" />
-                      </button>
+                        <img src={image} alt={`Galería ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                      </motion.button>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="info-sidebar">
-                <div className="project-stats">
-                  <h3>Detalles del Proyecto</h3>
-                  <div className="stat-item">
-                    <Calendar size={20} />
-                    <div>
-                      <span className="stat-label">Año</span>
-                      <span className="stat-value">{project.year}</span>
+              <div className="space-y-8">
+                <div className="bg-gray-900 text-white p-8 rounded-3xl shadow-xl sticky top-24">
+                  <h3 className="text-xl font-bold mb-8">Ficha Técnica</h3>
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
+                      <div className="w-12 h-12 flex items-center justify-center bg-amber-500 rounded-xl text-white">
+                        <Calendar size={24} />
+                      </div>
+                      <div>
+                        <span className="block text-xs text-gray-400 uppercase tracking-wider">Año</span>
+                        <span className="block text-lg font-semibold">{project.year}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="stat-item">
-                    <MapPin size={20} />
-                    <div>
-                      <span className="stat-label">Ubicación</span>
-                      <span className="stat-value">{project.location}</span>
-                    </div>
-                  </div>
-                  <div className="stat-item">
-                    <Euro size={20} />
-                    <div>
-                      <span className="stat-label">Presupuesto</span>
-                      <span className="stat-value">{project.budget}</span>
-                    </div>
-                  </div>
-                  <div className="stat-item">
-                    <Clock size={20} />
-                    <div>
-                      <span className="stat-label">Duración</span>
-                      <span className="stat-value">{project.duration}</span>
-                    </div>
-                  </div>
-                </div>
 
-                {project.testimonial && (
-                  <div className="testimonial-card">
-                    <h4>Testimonio del Cliente</h4>
-                    <blockquote>"{project.testimonial}"</blockquote>
-                    <cite>— {project.client_name}</cite>
-                  </div>
-                )}
+                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
+                      <div className="w-12 h-12 flex items-center justify-center bg-amber-500 rounded-xl text-white">
+                        <MapPin size={24} />
+                      </div>
+                      <div>
+                        <span className="block text-xs text-gray-400 uppercase tracking-wider">Ubicación</span>
+                        <span className="block text-lg font-semibold">{project.location}</span>
+                      </div>
+                    </div>
 
-                <div className="contact-cta">
-                  <h4>¿Te interesa este tipo de proyecto?</h4>
-                  <p>Contáctanos y te ayudaremos a hacerlo realidad</p>
-                  <Link to="/contacto" className="btn btn-primary btn-block">
-                    <Phone size={16} />
-                    Solicitar Presupuesto
-                  </Link>
+                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
+                      <div className="w-12 h-12 flex items-center justify-center bg-amber-500 rounded-xl text-white">
+                        <Euro size={24} />
+                      </div>
+                      <div>
+                        <span className="block text-xs text-gray-400 uppercase tracking-wider">Presupuesto</span>
+                        <span className="block text-lg font-semibold">{project.budget}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
+                      <div className="w-12 h-12 flex items-center justify-center bg-amber-500 rounded-xl text-white">
+                        <Clock size={24} />
+                      </div>
+                      <div>
+                        <span className="block text-xs text-gray-400 uppercase tracking-wider">Duración</span>
+                        <span className="block text-lg font-semibold">{project.duration}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {project.testimonial && (
+                    <div className="mt-8 pt-8 border-t border-white/10">
+                      <div className="relative">
+                        <span className="absolute -top-4 -left-2 text-6xl text-amber-500/20 font-serif">“</span>
+                        <p className="italic text-gray-300 relative z-10 mb-4">{project.testimonial}</p>
+                        <cite className="block font-bold text-amber-500 not-italic">— {project.client_name}</cite>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-8 space-y-4">
+                    <Link to="/contacto" className="flex items-center justify-center gap-3 w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold transition-all shadow-lg shadow-amber-500/20">
+                      <Phone size={20} />
+                      Solicitar Presupuesto
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -319,64 +393,44 @@ const ProjectDetail = () => {
         </section>
 
         {/* Related Projects */}
-        <section className="related-projects">
+        <section className="py-20 bg-gray-50">
           <div className="container">
-            <h2 className="section-title">Proyectos Relacionados</h2>
-            {relatedLoading ? (
-              <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>
-            ) : (
-              <>
-                <div className="related-grid">
-                  {relatedProjects.map(relatedProject => (
-                    <Link
-                      key={relatedProject.id}
-                      to={`/proyectos/${relatedProject.id}`}
-                      className="related-card"
-                    >
-                      <div className="related-image">
-                        <img src={relatedProject.images && relatedProject.images[0] ? relatedProject.images[0] : '/placeholder-project.jpg'} alt={relatedProject.title} loading="lazy" />
-                        <div className="related-overlay">
-                          <h3>{relatedProject.title}</h3>
-                          <p>{relatedProject.location}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Proyectos Relacionados</h2>
+                <p className="text-gray-600 max-w-2xl">Otros trabajos similares que podrían interesarte en la categoría de {getCategoryName(project.category)}.</p>
+              </div>
+              <Link to="/proyectos" className="text-amber-600 font-bold hover:text-amber-700 flex items-center gap-2 group">
+                Ver todos los proyectos
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
 
+            {relatedLoading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="w-12 h-12 animate-spin text-amber-500" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {relatedProjects.map(relatedProject => (
+                  <ProjectCard key={relatedProject.id} project={relatedProject} />
+                ))}
+                
                 {relatedProjects.length === 0 && (
-                  <div className="no-related">
-                    <p>No hay proyectos relacionados en esta categoría.</p>
-                    <Link to="/proyectos" className="btn btn-outline">
-                      Ver todos los proyectos
+                  <div className="col-span-full bg-white p-12 rounded-3xl border border-gray-100 text-center">
+                    <p className="text-gray-500 mb-6">No hay proyectos relacionados en esta categoría.</p>
+                    <Link to="/proyectos" className="inline-flex px-8 py-3 bg-amber-500 text-white rounded-xl font-bold">
+                      Explorar galería completa
                     </Link>
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="section cta-section">
-          <div className="container text-center">
-            <h2>¿Tienes un proyecto en mente?</h2>
-            <p>Transformamos tus ideas en espacios funcionales y hermosos. Contáctanos para una consulta gratuita.</p>
-            <div className="cta-buttons">
-              <Link to="/contacto" className="btn btn-primary btn-lg">
-                <Phone size={20} />
-                Solicitar Consulta
-              </Link>
-              <a
-                href={`tel:+34666123456`}
-                className="btn btn-outline btn-lg"
-              >
-                <Phone size={20} />
-                Llamar Ahora
-              </a>
-            </div>
-          </div>
-        </section>
+        <CTASection />
       </div>
       <ModernFooter />
     </>
